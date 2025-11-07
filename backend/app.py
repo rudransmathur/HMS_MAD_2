@@ -7,6 +7,11 @@ from flask_security.datastore import SQLAlchemyUserDatastore
 from application.config import LocalDevConfig
 from dotenv import load_dotenv
 
+from application import *
+
+from resources import *
+from application import *
+
 def create_app():
     app = Flask(__name__)
 
@@ -18,10 +23,12 @@ def create_app():
 
     # Database
     db.init_app(app)
+
     # Security
     security = Security()
     datastore = SQLAlchemyUserDatastore(db, User, Role)
     security.init_app(app, datastore=datastore)
+
     # register_blueprint = False
     app.datastore = datastore
 

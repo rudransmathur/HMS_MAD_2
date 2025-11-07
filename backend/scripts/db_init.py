@@ -13,8 +13,8 @@ with app.app_context():
     datastore : SQLAlchemyUserDatastore = app.datastore
 
     admin_role = datastore.find_or_create_role('admin', description='Administrator')
-    patient_role = datastore.find_or_create_role('Patient', description='Patient')
-    doctors_role = datastore.find_or_create_role('Doctors', description='Doctors')
+    patient_role = datastore.find_or_create_role('Patient', description='Patients')
+    doctors_role = datastore.find_or_create_role('Doctor', description='Doctors')
     db.session.add(admin_role)
     db.session.add(patient_role)
     db.session.add(doctors_role)
@@ -22,7 +22,7 @@ with app.app_context():
     print('Created Roles')
 
     if not datastore.find_user(username='admin'):
-        datastore.create_user(username='admin', email='@gmail.com', password=hash_password('admin'))
+        datastore.create_user(username='admin', email='admin@gmail.com', password=hash_password('admin'))
     db.session.commit()
     print('Created Admin')
 
