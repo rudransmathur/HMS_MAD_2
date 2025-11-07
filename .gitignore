@@ -10,5 +10,6 @@ wheels/
 backend/.venv
 .env
 
+database.sqlite3
 .idea
 .python-version
