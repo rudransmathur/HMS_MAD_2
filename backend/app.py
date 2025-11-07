@@ -1,10 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-
-from application.model import *
 from flask_security import Security
 from flask_security.datastore import SQLAlchemyUserDatastore
-from application.config import LocalDevConfig
 from dotenv import load_dotenv
 
 from application import *
@@ -32,9 +29,9 @@ def create_app():
     # register_blueprint = False
     app.datastore = datastore
 
-    @app.route("/")
-    def home():
-        return "Hello, World!"
+    app.register_blueprint(auth_bp)
+
+    # api.init_app(app)
 
     return app
 
