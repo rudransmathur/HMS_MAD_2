@@ -30,7 +30,7 @@ def create_app():
     app.datastore = datastore
 
     app.register_blueprint(auth_bp)
-
+    app.register_blueprint(api_bp)
     # api.init_app(app)
 
     return app
