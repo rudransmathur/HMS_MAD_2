@@ -22,7 +22,7 @@ class AppointmentService:
             raise ServiceError("not Found")
         db.session.delete(item)
         db.session.commit()
-        return item
+        return {"message": "deleted item {}".format(ap_id)}
 
     @staticmethod
     def update_appointment(data):

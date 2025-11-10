@@ -14,7 +14,7 @@ def login():
     username = data['username']
     password = data['password']
 
-    if (not username or not password):
+    if not username or not password:
         return jsonify({"message": "Please provide username and password"}), 400
 
     user = User.query.filter_by(username=username).first()
