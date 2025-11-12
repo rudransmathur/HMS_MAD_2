@@ -24,7 +24,7 @@ if exist "requirements.txt" (
 )
 
 REM Initalise Database
-python -m scripts.db_init
+python -m scripts.seed
 
 REM Deactivate virtual environment
 deactivate

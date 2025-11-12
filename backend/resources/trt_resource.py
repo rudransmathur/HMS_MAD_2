@@ -3,16 +3,16 @@ from flask import Blueprint, jsonify, request
 from flask_restful import Resource, marshal, fields, reqparse
 
 from .marshal_fields import treatment_marshal
-from services.trt_services import TreatmentService
+from services import TreatmentService
 
 
 parser = reqparse.RequestParser()
-parser.add_argument('appointment_id', type=int)
-parser.add_argument('patient_id', type=int)
-parser.add_argument('doctor_id', type=int)
-parser.add_argument('diagnosis', type=str)
-parser.add_argument('prescription', type=str)
-parser.add_argument('notes', type=str)
+parser.add_argument('appointment_id', type=int, required=True)
+parser.add_argument('patient_id', type=int, required=True)
+parser.add_argument('doctor_id', type=int, required=True)
+parser.add_argument('diagnosis', type=str, required=True)
+parser.add_argument('prescription', type=str, required=True)
+parser.add_argument('notes', type=str, required=True)
 
 class TreatmentResource(Resource):
     @staticmethod

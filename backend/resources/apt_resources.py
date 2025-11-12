@@ -3,16 +3,16 @@ from flask import Blueprint, jsonify, request
 from flask_restful import Resource, marshal, fields, reqparse
 
 from .marshal_fields import appointment_marshal
-from services.apt_services import AppointmentService
+from services import AppointmentService
 
 
 parser = reqparse.RequestParser()
-parser.add_argument('patient_id', type=int)
-parser.add_argument('doctor_id', type=int)
-parser.add_argument('appointment_date', type=str)
-parser.add_argument('appointment_time', type=str)
-parser.add_argument('status', type=str)
-parser.add_argument('reason', type=str)
+parser.add_argument('patient_id', type=int, required=True)
+parser.add_argument('doctor_id', type=int, required=True)
+parser.add_argument('appointment_date', type=str, required=True)
+parser.add_argument('appointment_time', type=str, required=True)
+parser.add_argument('status', type=str, required=True)
+parser.add_argument('reason', type=str, required=True)
 
 class AppointmentResource(Resource):
     @staticmethod

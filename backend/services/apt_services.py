@@ -1,6 +1,6 @@
-from application.model import Appointment
-from application.database import db
-from services.service_errors import ServiceError
+from application import Appointment
+from application import db
+from .service_errors import ServiceError
 from datetime import datetime
 
 class AppointmentService:

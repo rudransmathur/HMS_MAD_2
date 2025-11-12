@@ -26,8 +26,8 @@ class User(db.Model, UserMixin):
     fs_uniquifier = db.Column(db.String, unique=True, nullable=False)
     active = db.Column(db.Boolean(), default=True)
 
-    patient_profile = db.relationship('Patient', back_populates='user', uselist=False)
-    doctor_profile = db.relationship('Doctor', back_populates='user', uselist=False)
+    patient_profile = db.relationship('Patient', back_populates='user', uselist=False, cascade='all, delete-orphan')
+    doctor_profile = db.relationship('Doctor', back_populates='user', uselist=False, cascade='all, delete-orphan')
     roles = db.relationship('Role', secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
 
 class Patient(db.Model):
@@ -52,7 +52,7 @@ class Patient(db.Model):
 class Doctor(db.Model):
     __tablename__ = 'doctor'
     doctor_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), primary_key=True)
-    department_name = db.Column(db.Integer, nullable=False)
+    department_name = db.Column(db.String, nullable=False)
     qualification = db.Column(db.String(200)) # MBBS MD DO DDS etc
     experience_years = db.Column(db.Integer)
     specialization = db.Column(db.String(100))
@@ -70,6 +70,18 @@ class DoctorAvailability(db.Model):
     end_time = db.Column(db.Time, nullable=False)
 
     doctor = db.relationship('User', backref=db.backref('availabilities', lazy=True))
+
+class Request(db.Model):
+    __tablename__ = 'request'
+    r_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    data = db.Column(db.JSON())
+    status = db.Column(db.Enum("approved", "rejected", "created"))
+    type = db.Column(db.String(20))
+
+    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
+
+    user = db.relationship('User', backref=db.backref('requests', lazy=True))
+
 
 class Appointment(db.Model):
     __tablename__ = 'appointment'

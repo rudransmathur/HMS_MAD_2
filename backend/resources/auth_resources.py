@@ -3,7 +3,8 @@ from flask import Blueprint, jsonify, request
 from flask_security import verify_password, hash_password
 
 from flask import current_app
-from application.model import User, db
+from application import User, db
+from flask_login import login_user
 
 auth_bp = Blueprint("auth", __name__, url_prefix='/api/auth')
 
@@ -22,6 +23,10 @@ def login():
         return jsonify({"message": "User does not exist"}), 404
     if not verify_password(password, user.password):
         return jsonify({"message":"Invalid Password"}), 400
+
+    # create a server-side session (session cookie) so @login_required works
+    login_user(user)
+
     return jsonify({
         "id": user.user_id,
         "name": user.username,

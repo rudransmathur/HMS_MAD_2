@@ -1,33 +1,32 @@
-from application import Treatment
+from application import Request
 from application import db
 from .service_errors import ServiceError
 from datetime import datetime
 
-
-class TreatmentService:
+class RequestService:
     @staticmethod
     def get_all():
-        return Treatment.query.all()
+        return Request.query.all()
 
     @staticmethod
-    def get_treatment(t_id):
-        item = Treatment.query.filter_by(t_id=t_id)
+    def get_request(r_id):
+        item = Request.query.filter_by(r_id=t_id)
         if not item:
             raise ServiceError("not Found")
         return item
 
     @staticmethod
-    def delete_treatment(t_id):
-        item = Treatment.query.filter_by(t_id=t_id).first()
+    def delete_request(r_id):
+        item = Request.query.filter_by(r_id=r_id).first()
         if not item:
             raise ServiceError("not Found")
         db.session.delete(item)
         db.session.commit()
-        return {"message": "deleted item {}".format(t_id)}
+        return {"message": "deleted item {}".format(r_id)}
 
     @staticmethod
-    def update_treatment(data):
-        item = Treatment.query.filter_by(t_id=data['t_id']).first()
+    def update_request(data):
+        item = Request.query.filter_by(r_id=data['r_id']).first()
         if not item:
             raise ServiceError("not Found")
 
@@ -39,12 +38,11 @@ class TreatmentService:
         return item
 
     @staticmethod
-    def create_treatment(data):
-        item = Treatment.query.filter_by(t_id=data.get('t_id')).first()
+    def create_request(data):
+        item = Request.query.filter_by(r_id=data.get('r_id')).first()
         if item:
             raise ServiceError("Already Exists")
-
-        item = Treatment(**data)
+        item = Request(**data)
         db.session.add(item)
         db.session.commit()
         return item
