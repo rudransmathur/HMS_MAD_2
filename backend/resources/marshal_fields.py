@@ -60,3 +60,11 @@ doctor_marshal = {
     "consultation_fee": fields.Float(attribute="doctor_profile.consultation_fee"),
     "is_active": fields.Boolean(attribute="doctor_profile.is_active")
 }
+
+availability_marshal = {
+    "dav_id": fields.Integer,
+    "doctor_id": fields.Integer,
+    "day_of_week": fields.Integer,
+    "start_time": fields.String(attribute="start_time"),
+    "end_time": fields.String(attribute="end_time")
+}
