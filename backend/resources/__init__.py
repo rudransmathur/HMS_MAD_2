@@ -23,4 +23,7 @@ api.add_resource(UserResource, '/user/<int:user_id>')
 api.add_resource(DoctorAvailabilityListResource, '/doctoravailability')
 api.add_resource(DoctorAvailabilityResource, '/doctoravailability/<int:doc_id>')
 
+api.add_resource(RequestListResource, '/requests')
+api.add_resource(RequestResource, '/requests/<int:request_id>')
+
 api_bp.add_url_rule("/user/<int:user_id>/approve", view_func=approve_user, methods=['PATCH'])

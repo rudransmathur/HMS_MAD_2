@@ -68,3 +68,11 @@ availability_marshal = {
     "start_time": fields.String(attribute="start_time"),
     "end_time": fields.String(attribute="end_time")
 }
+
+request_marshal = {
+    "r_id": fields.Integer,
+    "data": fields.Raw,
+    "status": fields.String,
+    "type": fields.String,
+    "user_id": fields.Integer
+}
