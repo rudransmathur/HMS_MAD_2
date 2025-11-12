@@ -1,4 +1,4 @@
-from application import User, Patient, Doctor
+from application import User, Patient, Doctor, DoctorAvailability
 from application import db
 from .service_errors import ServiceError
 from datetime import datetime
@@ -25,9 +25,14 @@ class UserService:
 
     @staticmethod
     def delete_user(user_id):
+        
         item = User.query.filter_by(user_id=user_id).first()
         if not item:
             raise ServiceError("not Found")
+        
+        # Delete related DoctorAvailability records if doctor profile exists
+        if item.doctor_profile:
+            DoctorAvailability.query.filter_by(doctor_id=user_id).delete()
         
         # Delete related Doctor profile if exists
         if item.doctor_profile:

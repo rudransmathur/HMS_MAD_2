@@ -11,6 +11,7 @@ appointment_marshal = {
 }
 
 treatment_marshal = {
+    "appointment_id": fields.Integer,
     "patient_id": fields.Integer,
     "doctor_id": fields.Integer,
     "diagnosis": fields.String,
@@ -20,6 +21,7 @@ treatment_marshal = {
 }
 
 user_marshal = {
+    "user_id": fields.Integer,
     "username": fields.String,
     "fullname": fields.String,
     "phone": fields.Integer,
@@ -27,12 +29,34 @@ user_marshal = {
     "active": fields.Boolean
 }
 
+patient_marshal = {
+    "user_id": fields.Integer,
+    "username": fields.String,
+    "fullname": fields.String,
+    "phone": fields.Integer,
+    "email": fields.String,
+    "active": fields.Boolean,
+    "patient_id": fields.Integer(attribute="patient_profile.patient_id"),
+    "dob": fields.String(attribute="patient_profile.dob"),
+    "gender": fields.String(attribute="patient_profile.gender"),
+    "blood_group": fields.String(attribute="patient_profile.blood_group"),
+    "emergency_contact": fields.Integer(attribute="patient_profile.emergency_contact"),
+    "medical_history": fields.String(attribute="patient_profile.medical_history"),
+    "age": fields.Integer(attribute="patient_profile.age")
+}
+
 doctor_marshal = {
-    "doctor_id": fields.Integer,
-    "department_name": fields.Integer,
-    "qualification": fields.String,
-    "experience_years": fields.Integer,
-    "specialization": fields.String,
-    "consultation_fee": fields.Integer,
-    "is_active": fields.Boolean
+    "user_id": fields.Integer,
+    "username": fields.String,
+    "fullname": fields.String,
+    "phone": fields.Integer,
+    "email": fields.String,
+    "active": fields.Boolean,
+    "doctor_id": fields.Integer(attribute="doctor_profile.doctor_id"),
+    "department_name": fields.Integer(attribute="doctor_profile.department_name"),
+    "qualification": fields.String(attribute="doctor_profile.qualification"),
+    "experience_years": fields.Integer(attribute="doctor_profile.experience_years"),
+    "specialization": fields.String(attribute="doctor_profile.specialization"),
+    "consultation_fee": fields.Float(attribute="doctor_profile.consultation_fee"),
+    "is_active": fields.Boolean(attribute="doctor_profile.is_active")
 }

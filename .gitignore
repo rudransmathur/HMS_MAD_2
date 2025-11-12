@@ -10,6 +10,6 @@ wheels/
 backend/.venv
 .env
 
-/backend/db_directory/
+/backend/db_directory
 .idea
 .python-version

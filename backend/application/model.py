@@ -69,7 +69,7 @@ class DoctorAvailability(db.Model):
     start_time = db.Column(db.Time, nullable=False)
     end_time = db.Column(db.Time, nullable=False)
 
-    doctor = db.relationship('User', backref=db.backref('availabilities', lazy=True))
+    doctor = db.relationship('User', backref=db.backref('availabilities', lazy=True, cascade='all, delete-orphan'))
 
 class Request(db.Model):
     __tablename__ = 'request'
