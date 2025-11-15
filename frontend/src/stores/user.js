@@ -2,9 +2,9 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import api from '@/utils/api';
 
-const useUserStore = defineStore('user',{
+export const useUserStore = defineStore('user',{
     state: () => ({
-        token: localStorage.getItem('token') || '',
+        token: localStorage.getItem('access_token') || localStorage.getItem('token') || '',
         user: (()=>{
             try{
                 const raw = localStorage.getItem('user');
@@ -17,13 +17,23 @@ const useUserStore = defineStore('user',{
     }),
     getters: {
         isAuthenticated:(state)=> !!state.token,
-        role:(state) => state.user && state.user.role ? state.user.role : null,
-        isAdmin:(state) => state.user && state.user.role === 'admin'
+        role:(state) => state.user && state.user.role ? state.user.role.toLowerCase() : null,
+        isAdmin:(state) => (state.user && state.user.role && state.user.role.toLowerCase() === 'admin'),
+        isDoctor:(state) => (state.user && state.user.role && state.user.role.toLowerCase() === 'doctor'),
+        isPatient:(state) => (state.user && state.user.role && state.user.role.toLowerCase() === 'patient')
     },
     actions: {
         setToken(token){
-            this.token = token;
-            localStorage.setItem('access_token', token);
+            this.token = token || '';
+            if (token) {
+                try{
+                    localStorage.setItem('access_token', token);
+                    localStorage.setItem('token', token);
+                }catch(e){ console.warn('Could not persist token', e); }
+            } else {
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('token');
+            }
         },
         setUser(user){
             this.user = user;
@@ -42,18 +52,39 @@ const useUserStore = defineStore('user',{
             this.setUser(null);
         },
         async loginWithCredentials(endpoint='/auth/login', credentials={}){
-            const res = await api.post(endpoint, credentials);
-            const token = res && 
-                        (res.access_token 
-                        || res.token 
-                        || (res.data && (res.data.access_token || res.data.token)));
-            const user = res && (res.user || (res.data && res.data.user) || res);
-            if (!token) {
-                throw new Error("No token received from login response");
+            try {
+                const res = await api.post(endpoint, credentials);
+
+                // backend may return token in `token` or `access_token`, and user either
+                // as `user` object or individual fields. Normalize both.
+                console.log("Login response:", res);
+                const token = (res && (res.access_token || res.token));
+
+                let user = null;
+                if (res && res.user) {
+                    user = res.user;
+                } else if (res && (res.id || res.username || res.name)) {
+                    user = {
+                        id: res.id,
+                        name: res.username ,
+                        fullname: res.name || res.fullname,
+                        email: res.email,
+                        phone: res.phone,
+                        role: res.role // may be undefined
+                    };
+                }
+
+                if (!token) {
+                    throw new Error("No token received from login response");
+                }
+
+                this.setToken(token);
+                this.setUser(user);
+                return {token, user};
+            } catch (e) {
+                // re-throw with server message intact (api.js extracts it from response body)
+                throw e;
             }
-            this.setToken(token);
-            this.setUser(user);
-            return {token, user};
         }
     }
 });

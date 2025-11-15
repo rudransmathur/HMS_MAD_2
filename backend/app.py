@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_security import Security
 from flask_security.datastore import SQLAlchemyUserDatastore
+from flask_cors import CORS
 from dotenv import load_dotenv
 
 from application import *
@@ -21,7 +22,13 @@ def create_app():
     # Database
     db.init_app(app)
 
-    # Security
+    from flask_cors import CORS
+
+    # allow requests from dev origin for all /api/* endpoints
+    CORS(app, resources={r"/api/*": {"origins": ["http://localhost:5173", "http://127.0.0.1:5173"]}},
+         supports_credentials=True,
+         allow_headers=["Content-Type", "Authorization"])
+
     security = Security()
     datastore = SQLAlchemyUserDatastore(db, User, Role)
     security.init_app(app, datastore=datastore)

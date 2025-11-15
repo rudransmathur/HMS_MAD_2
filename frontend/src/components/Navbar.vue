@@ -6,47 +6,46 @@
         <router-link class="navbar-brand" to="/">HMS</router-link>
 
         <!-- Toggle button -->
-        <button class="navbar-toggler" type="button" data-mdb-collapse-init
-          data-mdb-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
           aria-label="Toggle navigation">
           <i class="fas fa-bars text-light"></i>
         </button>
 
         <!-- Collapsible wrapper -->
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
           <!-- Left links -->
-          <ul class="navbar-nav me-auto d-flex flex-row mt-3 mt-lg-0">
-            <li v-if="isAdmin" class="nav-item text-center mx-2 mx-lg-1">
-              <router-link class="nav-link" to="/admin">
-                Doctors
-              </router-link>
-            </li>
-            <li v-if="isPatient" class="nav-item text-center mx-2 mx-lg-1">
-              <router-link class="nav-link" to="/admin">
-                Doctors
+          <!-- Doctor -->
+          <ul v-if="isDoctor" class="navbar-nav mt-3 mt-lg-0">
+            <li class="nav-item text-center mx-2 mx-lg-1">
+              <router-link class="nav-link" to="/doctorappointments">
+                Appointments
               </router-link>
             </li>
             <li class="nav-item text-center mx-2 mx-lg-1">
-              <router-link class="nav-link" aria-disabled="true" href="/">
-                Disabled
+              <router-link class="nav-link" to="/doctortreatments">
+                Diagnosis Reports
               </router-link>
             </li>
-            <li class="nav-item dropdown text-center mx-2 mx-lg-1">
-              <a class="nav-link dropdown-toggle" href="/" id="navbarDropdown" role="button" data-mdb-dropdown-init
-                aria-expanded="false">
-                Dropdown
-            </a>
-              <!-- Dropdown menu -->
-              <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item" href="#">Action</a></li>
-                <li><a class="dropdown-item" href="#">Another action</a></li>
-                <li>
-                  <hr class="dropdown-divider" />
-                </li>
-                <li>
-                  <a class="dropdown-item" href="#">Something else here</a>
-                </li>
-              </ul>
+          </ul>
+
+          <!-- Patient -->
+          <ul v-if="isPatient" class="navbar-nav mt-3 mt-lg-0">
+            <li class="nav-item text-center mx-2 mx-lg-1">
+              <router-link class="nav-link" to="/patientappointments">
+                Appointments
+              </router-link>
+            </li>
+            <li class="nav-item text-center mx-2 mx-lg-1">
+              <router-link class="nav-link" to="/patienttreatments">
+                Diagnosis Reports
+              </router-link>
+            </li>
+            <li class="nav-item text-center mx-2 mx-lg-1">
+              <router-link class="nav-link" to="/patientsearch">
+                Search Doctors
+              </router-link>
             </li>
           </ul>
           <!-- Left links -->
@@ -54,14 +53,31 @@
           <!-- Right links -->
           <ul class="navbar-nav ms-auto d-flex flex-row mt-3 mt-lg-0">
             <li v-if="!isAuthenticated" class="nav-item text-center mx-2 mx-lg-1">
-              <router-link class="nav-link" href="#!">
+              <router-link class="nav-link" to="/login">
                 Login
               </router-link>
             </li>
             <li v-if="!isAuthenticated" class="nav-item text-center mx-2 mx-lg-1">
-              <router-link class="nav-link" href="#!">
+              <router-link class="nav-link" to="/signup">
                 Signup
               </router-link>
+            </li>
+            <li v-if="isAuthenticated" class="nav-item dropdown">
+              <button class="nav-link dropdown-toggle d-flex align-items-center" type="button" id="profileDropdown" data-bs-toggle="dropdown"
+                aria-expanded="false" style="background: none; border: none; cursor: pointer;">
+                <i class="bi bi-person"></i>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                <li>
+                  <router-link class="dropdown-item" to="/profile">Profile</router-link>
+                </li>
+                <li>
+                  <hr class="dropdown-divider" />
+                </li>
+                <li>
+                  <a class="dropdown-item" href="#" @click.prevent="handleLogout">Logout</a>
+                </li>
+              </ul>
             </li>
           </ul>
           <!-- Right links -->
@@ -94,14 +110,24 @@
                 return this.userStore && this.userStore.isAdmin;
             },
             isPatient(){
-                return this.userStore?.user?.role === 'patient'
+                return this.userStore && this.userStore.isPatient;
             },
             isDoctor(){
-                return this.userStore?.user?.role === 'doctor'
+                return this.userStore && this.userStore.isDoctor;
             },
             displayName(){
                 return this.userStore?.user?.name || 'Account';
             }
+        },
+        methods: {
+          handleLogout() {
+            if (this.userStore && typeof this.userStore.logout === 'function') {
+              this.userStore.logout();
+            }
+            if (this.$router) {
+              this.$router.push('/');
+            }
+          }
         }
     }
     

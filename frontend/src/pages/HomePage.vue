@@ -5,16 +5,25 @@
             <div class="container text-center py-5">
                 <h1 class="display-4 fw-bold">Hospital Management — Simple. Secure. Fast.</h1>
                 <p class="lead mb-4">Book appointments, manage patient records, and coordinate care — all from a single, easy-to-use dashboard designed for clinics and hospitals.</p>
-                <div>
-                    <router-link to="/signup" class="btn btn-light btn-lg me-2">Sign up as a patient now</router-link>
+                <div v-if ="!isAuthenticated">
+                    <router-link to="/signup" class="btn btn-light btn-lg me-2">Sign up</router-link>
                     <router-link to="/login" class="btn btn-outline-light btn-lg">Sign in</router-link>
+                </div>
+                <div v-if="isPatient">
+                    <router-link to="/patientappointments" class="btn btn-light btn-lg me-2">View Appointments</router-link>
+                    <router-link to="/patienttreatments" class="btn btn-outline-light btn-lg">View Doctor Diagnosis</router-link>
+                    <router-link to="/patientsearch" class="btn btn-outline-light btn-lg ms-2">Search Doctors</router-link>
+                </div>
+                <div v-if="isDoctor">
+                    <router-link to="/doctorappointments" class="btn btn-light btn-lg me-2">View Appointments</router-link>
+                    <router-link to="/doctortreatments" class="btn btn-outline-light btn-lg">View Diagnosis</router-link>
                 </div>
             </div>
         </section>
 
         <!-- Features cards -->
         <section class="py-5 bg-white">
-            <div class="container">
+            <div v-if="!isAuthenticated" class="container"> 
                 <div class="row mb-4">
                     <div class="col text-center">
                         <h2 class="fw-bold">What you can do with HMS</h2>
@@ -91,7 +100,7 @@
                                 <li class="mb-2"><span class="fw-bold">4.</span> Can <strong>view their own appointment history</strong> and treatment details.</li>
                             </ul>
                             <div class="mt-3">
-                                <router-link to="/signup" class="btn btn-primary me-2">Sign up as a patient</router-link>
+                                <router-link to="/signup" class="btn btn-primary me-2">Sign up</router-link>
                                 <router-link to="/appointments" class="btn btn-outline-primary">See appointments</router-link>
                             </div>
                         </div>
@@ -110,45 +119,12 @@
             </div>
         </section>
 
-        <!-- Doctors / contact section -->
-        <section class="py-5">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-md-6">
-                        <h3 class="fw-bold">Meet our doctors</h3>
-                        <p class="text-muted">Experienced specialists across departments. Book consultations and view profiles.</p>
-                        <router-link to="/appointments" class="btn btn-primary">View Appointments</router-link>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="row g-3">
-                            <div class="col-6">
-                                <div class="card">
-                                    <img src="https://via.placeholder.com/300x200?text=Dr.+A" class="card-img-top" alt="Dr A">
-                                    <div class="card-body p-2 text-center">
-                                        <small class="d-block">Dr. A — Cardiology</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="card">
-                                    <img src="https://via.placeholder.com/300x200?text=Dr.+B" class="card-img-top" alt="Dr B">
-                                    <div class="card-body p-2 text-center">
-                                        <small class="d-block">Dr. B — Neurology</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <!-- Footer CTA -->
-        <section class="py-4 bg-primary text-white">
+        <section v-if="!isAuthenticated" class="py-4 bg-primary text-white">
             <div class="container d-flex justify-content-between align-items-center">
                 <div>
                     <strong>Ready to manage care more efficiently?</strong>
-                    <div class="text-white-50">Start with a free patient signup and explore the dashboard.</div>
+                    <div class="text-white-50">Start with a free signup and explore the dashboard.</div>
                 </div>
                 <div>
                     <router-link to="/signup" class="btn btn-light">Get started</router-link>
@@ -158,8 +134,36 @@
     </div>
 </template>
 
-<script setup>
-// No script logic needed for the static home page — router-link is available globally
+<script>
+    import useUserStore from '@/stores/user';
+    export default {
+        name: 'HomePage',
+        data() {
+            return {
+                userStore: null
+            };
+        },
+        created(){
+            this.userStore = useUserStore();
+        },
+        computed:{
+            isAuthenticated(){
+                return this.userStore && this.userStore.isAuthenticated;
+            },
+            isAdmin(){
+                return this.userStore && this.userStore.isAdmin;
+            },
+            isPatient(){
+                return this.userStore && this.userStore.isPatient;
+            },
+            isDoctor(){
+                return this.userStore && this.userStore.isDoctor;
+            },
+            displayName(){
+                return this.userStore?.user?.name || 'Account';
+            }
+        }
+    };
 </script>
 
 <style scoped>
