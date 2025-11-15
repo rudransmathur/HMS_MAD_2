@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
+import api from '@/utils/api';
 
 const useUserStore = defineStore('user',{
     state: () => ({
@@ -56,3 +57,5 @@ const useUserStore = defineStore('user',{
         }
     }
 });
+
+export default useUserStore;
