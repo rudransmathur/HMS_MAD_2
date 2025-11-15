@@ -2,9 +2,9 @@ from flask_restful import Api
 from flask import Blueprint
 
 from .auth_resources import auth_bp
-from .apt_resources import AppointmentResource, AppointmentListResource
-from .trt_resource import TreatmentResource, TreatmentListResource
-from .user_resources import UserResource, UserListResource, approve_user
+from .apt_resources import AppointmentResource, AppointmentListResource, PatientAppointmentsResource, DoctorAppointmentsResource
+from .trt_resource import TreatmentResource, TreatmentListResource, PatientTreatmentResource, DoctorTreatmentResource
+from .user_resources import UserResource, UserListResource, DoctorResource, approve_user
 from .dct_aval_resources import DoctorAvailabilityResource, DoctorAvailabilityListResource
 from .rqt_resources import RequestResource, RequestListResource
 
@@ -13,6 +13,8 @@ api = Api(api_bp)
 
 api.add_resource(AppointmentListResource, '/appointments')
 api.add_resource(AppointmentResource, '/appointments/<int:ap_id>')
+api.add_resource(PatientAppointmentsResource, '/appointments/patient/<int:patient_id>')
+api.add_resource(DoctorAppointmentsResource, '/appointments/doctor/<int:doctor_id>')
 
 api.add_resource(TreatmentListResource, '/treatments')
 api.add_resource(TreatmentResource, '/treatment/<int:t_id>')

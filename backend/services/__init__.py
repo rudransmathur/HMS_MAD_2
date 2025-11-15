@@ -5,3 +5,4 @@ from .patient_services import PatientService
 from .doctor_services import DoctorService
 from .rqt_service import RequestService
 from .dct_aval_services import DoctorAvailabilityService
+from .service_errors import ServiceError

@@ -1,9 +1,12 @@
 from flask_restful import fields
 
 appointment_marshal = {
+    "ap_id": fields.Integer,
     "patient_id": fields.Integer,
     "doctor_id": fields.Integer,
-    "appointment_date": fields.String(attribute="appointment_date"),  # Will be converted from date object to string
+    "patient_name": fields.String(attribute="patient.user.fullname"),
+    "doctor_name": fields.String(attribute="doctor.user.fullname"),
+    "appointment_date": fields.String(attribute="appointment_date"),
     "appointment_time": fields.String(attribute="appointment_time"),
     "status": fields.String,
     "reason": fields.String,
@@ -53,7 +56,7 @@ doctor_marshal = {
     "email": fields.String,
     "active": fields.Boolean,
     "doctor_id": fields.Integer(attribute="doctor_profile.doctor_id"),
-    "department_name": fields.Integer(attribute="doctor_profile.department_name"),
+    "department_name": fields.String(attribute="doctor_profile.department_name"),
     "qualification": fields.String(attribute="doctor_profile.qualification"),
     "experience_years": fields.Integer(attribute="doctor_profile.experience_years"),
     "specialization": fields.String(attribute="doctor_profile.specialization"),

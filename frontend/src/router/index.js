@@ -1,16 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import HomePage from '@/pages/HomePage.Vue'
-import LoginPage from '@/pages/LoginPage.vue'
-import Signup from '@/pages/Signup.vue'
-
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    {path: '/', component: HomePage},
-    {path: '/login', component: LoginPage},
-    {path: '/signup', component: Signup}
+    {path: '/', component: () => import('@/pages/HomePage.vue')},
+    {path: '/login', component: () => import('@/pages/LoginPage.vue')},
+    {path: '/signup', component: () => import('@/pages/Signup.vue')},
+    {path: '/patientappointments', component: () => import('@/pages/patient/Dashboard.vue')},
+    {path: '/patienttreatments', component: () => import('@/pages/patient/Diagnosis.vue')},
+    {path: '/patientsearch', component: () => import('@/pages/patient/Search.vue')},
+    {path: '/profile', component: () => import('@/pages/patient/Profile.vue')}
   ],
 })
 

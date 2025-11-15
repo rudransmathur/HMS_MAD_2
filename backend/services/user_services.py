@@ -9,14 +9,6 @@ class UserService:
         return User.query.all()
 
     @staticmethod
-    def get_all_doctors():
-        return Doctor.query.all()
-
-    @staticmethod
-    def get_doctors():
-        return Doctor.query.all()
-
-    @staticmethod
     def get_user(user_id):
         item = User.query.filter_by(user_id=user_id)
         if not item:

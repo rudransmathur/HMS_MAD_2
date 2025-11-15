@@ -3,37 +3,59 @@ const BaseURL = 'http://localhost:5000/api';
 const api = {
     async request(endpoint, options = {}){
         const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-        const url = `${BaseURL.replace(/\/$/, '')}${path}`;
-        const token = localStorage.getItem('access_token');
+        const url = `${BaseURL}${path}`;
+        const token = localStorage.getItem('access_token') || localStorage.getItem('token');
 
-        const headers = {"Content-Type": "application/json", ...option.headers};
+        const headers = {"Content-Type": "application/json", ...(options.headers || {})};
         
         if (token){
-            headers["Authoriztion"] = token;
+            // include a bearer token; server may accept raw token as well
+            headers['Authorization'] = `Bearer ${token}`;
+            // Also provide Flask-Security's default token header so token auth works
+            headers['Authentication-Token'] = token;
+        }
+
+        // Ensure CORS mode is set and cookies are included (helps if backend uses session cookies)
+        const config = {
+            mode: 'cors',
+            credentials: options.credentials || 'include',
+            ...options,
+            headers
         };
 
-        const config = {...options, headers};
+        // Helpful debug: show whether a token will be sent (remove in production if noisy)
+        // eslint-disable-next-line no-console
+        console.debug('[api] request', endpoint, 'tokenPresent=', !!token);
 
         try{
-            response = await fetch(url, config);
+            const response = await fetch(url, config);
 
             if (response.status == 401){
-                aleart("Please login first.");
+                alert("Please login first.");
                 throw new Error("Unauthorized");
             };
 
             if (!response.ok) {
-                let body = null;
+                let errorMessage = `HTTP error! status: ${response.status}`;
                 try{
-                    body = await response.text();
+                    const body = await response.text();
+                    // try to parse as JSON and extract 'message' field from backend
+                    if (body) {
+                        try {
+                            const json = JSON.parse(body);
+                            if (json.message) {
+                                errorMessage = json.message;
+                            }
+                        } catch (e) {
+                            // not JSON, use raw text
+                            errorMessage = body || errorMessage;
+                        }
+                    }
                 }catch(e){
                     //console.log("Error reading response body", e);
                 }
-                const message = body 
-                ? `${response.status} - ${body}` 
-                : `HTTP error! status: ${response.status}`;
 
-                const err = new Error(message);
+                const err = new Error(errorMessage);
                 err.status = response.status;
                 throw err;
             };

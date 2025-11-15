@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, request
 from flask_restful import Resource, marshal, fields, reqparse
 
 from .marshal_fields import appointment_marshal
-from services import AppointmentService
+from services import AppointmentService, ServiceError
 
 
 parser = reqparse.RequestParser()
@@ -13,6 +13,7 @@ parser.add_argument('appointment_date', type=str, required=True)
 parser.add_argument('appointment_time', type=str, required=True)
 parser.add_argument('status', type=str, required=True)
 parser.add_argument('reason', type=str, required=True)
+
 
 class AppointmentResource(Resource):
     @staticmethod
@@ -52,8 +53,26 @@ class AppointmentListResource(Resource):
     def get():
         items = AppointmentService.get_all()
         return marshal(items, appointment_marshal), 200
+
     @staticmethod
     def post():
         args = parser.parse_args()
         item = AppointmentService.create_appointment(args)
         return marshal(item, appointment_marshal), 201
+
+
+class PatientAppointmentsResource(Resource):
+    @staticmethod
+    def get(patient_id):
+        try:
+            items = AppointmentService.get_appointments_by_patient(patient_id)
+            return marshal(items, appointment_marshal), 200
+        except ServiceError as e:
+            return {"message": e.message}, 404
+
+
+class DoctorAppointmentsResource(Resource):
+    @staticmethod
+    def get(doctor_id):
+        items = AppointmentService.get_appointments_by_doctor(doctor_id)
+        return marshal(items, appointment_marshal), 200
