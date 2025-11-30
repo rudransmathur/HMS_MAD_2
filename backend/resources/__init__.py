@@ -7,6 +7,7 @@ from .trt_resource import TreatmentResource, TreatmentListResource, PatientTreat
 from .user_resources import UserResource, UserListResource, DoctorResource, PatientResource, approve_user
 from .dct_aval_resources import DoctorAvailabilityResource, DoctorAvailabilityListResource
 from .rqt_resources import RequestResource, RequestListResource
+from .reminder_resources import ReminderResource
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 api = Api(api_bp)
@@ -31,5 +32,7 @@ api.add_resource(DoctorAvailabilityResource, '/doctoravailability/<int:doc_id>')
 
 api.add_resource(RequestListResource, '/requests')
 api.add_resource(RequestResource, '/requests/<int:r_id>')
+
+api.add_resource(ReminderResource, '/reminders/trigger')
 
 api_bp.add_url_rule("/user/<int:user_id>/approve", view_func=approve_user, methods=['PATCH'])

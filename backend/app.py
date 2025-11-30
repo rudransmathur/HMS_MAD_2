@@ -4,11 +4,15 @@ from flask_security import Security
 from flask_security.datastore import SQLAlchemyUserDatastore
 from flask_cors import CORS
 from dotenv import load_dotenv
+import logging
 
 from application import *
-
 from resources import *
-from application import *
+from services.scheduled_jobs import init_scheduler
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def create_app():
     app = Flask(__name__)
@@ -39,6 +43,10 @@ def create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(api_bp)
     # api.init_app(app)
+
+    # Initialize scheduler for background jobs
+    with app.app_context():
+        init_scheduler(app)
 
     return app
 
