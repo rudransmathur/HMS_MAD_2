@@ -11,7 +11,6 @@ const api = {
         if (token){
             // include a bearer token; server may accept raw token as well
             headers['Authorization'] = `Bearer ${token}`;
-<<<<<<< HEAD
             // Also provide Flask-Security's default token header so token auth works
             headers['Authentication-Token'] = token;
         }
@@ -23,9 +22,6 @@ const api = {
             ...options,
             headers
         };
-=======
-        }
->>>>>>> 41b185b6bed628ebefdf242bf3df96c74a0e7835
 
         // Helpful debug: show whether a token will be sent (remove in production if noisy)
         // eslint-disable-next-line no-console

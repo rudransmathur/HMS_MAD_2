@@ -63,20 +63,12 @@ export const useUserStore = defineStore('user',{
                 let user = null;
                 if (res && res.user) {
                     user = res.user;
-<<<<<<< HEAD
                 } else if (res && (res.id || res.name || res.username)) {
                     // Backend returns: id, name (username), fullname, email, phone, role, token
                     user = {
                         id: res.id,
                         name: res.name || res.username,  // Backend sends 'name' as username
                         fullname: res.fullname,
-=======
-                } else if (res && (res.id || res.username || res.name)) {
-                    user = {
-                        id: res.id,
-                        name: res.username ,
-                        fullname: res.name || res.fullname,
->>>>>>> 41b185b6bed628ebefdf242bf3df96c74a0e7835
                         email: res.email,
                         phone: res.phone,
                         role: res.role // may be undefined
