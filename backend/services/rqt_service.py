@@ -10,7 +10,7 @@ class RequestService:
 
     @staticmethod
     def get_request(r_id):
-        item = Request.query.filter_by(r_id=t_id)
+        item = Request.query.filter_by(r_id=r_id)
         if not item:
             raise ServiceError("not Found")
         return item

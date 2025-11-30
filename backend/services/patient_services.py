@@ -1,4 +1,4 @@
-from application.model import Patient
+from application.model import User, Patient
 from application.database import db
 from .service_errors import ServiceError
 from datetime import datetime
@@ -6,7 +6,7 @@ from datetime import datetime
 class PatientService:
     @staticmethod
     def get_all():
-        return Patient.query.all()
+        return User.query.filter(User.patient_profile != None).all()
 
     @staticmethod
     def get_patient(patient_id):

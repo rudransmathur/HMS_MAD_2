@@ -44,7 +44,13 @@ class AppointmentService:
             data['appointment_date'] = datetime.strptime(data['appointment_date'], '%Y-%m-%d').date()
 
         if 'appointment_time' in data and data['appointment_time']:
-            data['appointment_time'] = datetime.strptime(data['appointment_time'], '%H:%M:%S').time()
+            try:
+                data['appointment_time'] = datetime.strptime(data['appointment_time'], '%H:%M:%S').time()
+            except ValueError:
+                try:
+                    data['appointment_time'] = datetime.strptime(data['appointment_time'], '%H:%M').time()
+                except ValueError:
+                    raise ServiceError("Invalid time format. Use HH:MM:SS or HH:MM")
 
         for key in data:
             if data[key] is not None:

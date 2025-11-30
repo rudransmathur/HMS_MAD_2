@@ -9,9 +9,7 @@ const api = {
         const headers = {"Content-Type": "application/json", ...(options.headers || {})};
         
         if (token){
-            // include a bearer token; server may accept raw token as well
             headers['Authorization'] = `Bearer ${token}`;
-            // Also provide Flask-Security's default token header so token auth works
             headers['Authentication-Token'] = token;
         }
 
@@ -52,7 +50,7 @@ const api = {
                         }
                     }
                 }catch(e){
-                    //console.log("Error reading response body", e);
+                    // console.log("Error reading response body", e);
                 }
 
                 const err = new Error(errorMessage);

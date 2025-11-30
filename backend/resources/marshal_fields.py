@@ -79,5 +79,7 @@ request_marshal = {
     "data": fields.Raw,
     "status": fields.String,
     "type": fields.String,
-    "user_id": fields.Integer
+    "user_id": fields.Integer,
+    "username": fields.String(attribute="user.username"),
+    "fullname": fields.String(attribute="user.fullname")
 }

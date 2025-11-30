@@ -48,6 +48,25 @@
               </router-link>
             </li>
           </ul>
+
+          <!-- Admin -->
+           <ul v-if="isAdmin" class="navbar-nav mt-3 mt-lg-0">
+            <li class="nav-item text-center mx-2 mx-lg-1">
+              <router-link class="nav-link" to="/admindoctors">
+                Doctor Requests
+              </router-link>
+            </li>
+            <li class="nav-item text-center mx-2 mx-lg-1">
+              <router-link class="nav-link" to="/adminappointments">
+                Manage Appointments
+              </router-link>
+            </li>
+            <li class="nav-item text-center mx-2 mx-lg-1">
+              <router-link class="nav-link" to="/adminsearch">
+                Search/Edit Users
+              </router-link>
+            </li>
+          </ul>
           <!-- Left links -->
 
           <!-- Right links -->
@@ -74,7 +93,7 @@
                 <li v-if="isDoctor">
                   <router-link class="dropdown-item" to="/doctorprofile">Profile</router-link>
                 </li>
-                <li>
+                <li v-if="!isAdmin">
                   <hr class="dropdown-divider" />
                 </li>
                 <li>

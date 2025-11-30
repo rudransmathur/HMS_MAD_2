@@ -7,12 +7,11 @@ from services import RequestService
 
 
 parser = reqparse.RequestParser()
-parser.add_argument('appointment_id', type=int, required=True)
-parser.add_argument('patient_id', type=int, required=True)
-parser.add_argument('doctor_id', type=int, required=True)
-parser.add_argument('diagnosis', type=str, required=True)
-parser.add_argument('prescription', type=str, required=True)
-parser.add_argument('notes', type=str, required=True)
+parser.add_argument('r_id', type=int, required=True)
+parser.add_argument('data', type=dict, required=True)
+parser.add_argument('status', type=str, required=True)
+parser.add_argument('type', type=str, required=True)
+parser.add_argument('user_id', type=int, required=True)
 
 class RequestResource(Resource):
     @staticmethod

@@ -23,6 +23,8 @@ def login():
         return jsonify({"message": "User does not exist"}), 404
     if not verify_password(password, user.password):
         return jsonify({"message":"Invalid Password"}), 400
+    if not user.active:
+        return jsonify({"message":"User is flagged"})
 
     login_user(user)
 
@@ -53,76 +55,84 @@ def register():
     exists = User.query.filter_by(username=username).first() or User.query.filter_by(email=email).first()
     if exists:
         return jsonify({"message": "User already exists"}), 400
-    if role not in ["Doctor", "Patient"] or not (username and fullname and phone and email and password):
+    if role not in ["Doctor", "Patient"]:
         return jsonify({"message": "Invalid info"}), 400
+    if not (username and fullname and phone and email and password):
+        return jsonify({"message": "Enter Values in fields"}), 400
     if role == "Doctor":
         active = False
 
-    datastore = current_app.datastore
+    try:
+        datastore = current_app.datastore
 
-    user = datastore.create_user(username=username,
-                                 fullname=fullname,
-                                 phone=phone,
-                                 email=email,
-                                 password=hash_password(password),
-                                 active=active)
-    user = User.query.filter_by(username=username).first()
-    if role=="Patient":
-        dob = data["dob"]
-        # Convert dob string (YYYY-MM-DD) to Python date object
-        if isinstance(dob, str):
-            dob = datetime.strptime(dob, '%Y-%m-%d').date()
-        
-        gender = data["gender"]
-        emergency_contact = data["emergency_contact"]
-        blood_group = data.get("blood_group", "")
-        medical_history = data.get("medical_history", "")
+        user = datastore.create_user(username=username,
+                                     fullname=fullname,
+                                     phone=phone,
+                                     email=email,
+                                     password=hash_password(password),
+                                     active=active)
+        user = User.query.filter_by(username=username).first()
+    except Exception as e:
+        return jsonify({"message": f"SignUp error: {e}"}), 500
+    try:
+        if role=="Patient":
+            dob = data["dob"]
+            # Convert dob string (YYYY-MM-DD) to Python date object
+            if isinstance(dob, str):
+                dob = datetime.strptime(dob, '%Y-%m-%d').date()
 
-        item = Patient(patient_id = user.user_id, dob = dob, gender = gender,
-                       emergency_contact = emergency_contact, blood_group = blood_group,
-                       medical_history = medical_history)
-        db.session.add(item)
-        db.session.commit()
-    else:
-        department_name = data["department_name"]
-        qualification = data["qualification"]
-        experience_years = data["experience_years"]
-        specialization = data["specialization"]
-        consultation_fee = data["consultation_fee"]
-        availabilities = data["availabilities"]
+            gender = data["gender"]
+            emergency_contact = data["emergency_contact"]
+            blood_group = data.get("blood_group", "")
+            medical_history = data.get("medical_history", "")
 
-        item = Doctor(doctor_id = user.user_id, department_name = department_name,
-                      qualification = qualification, experience_years = experience_years,
-                      specialization = specialization, consultation_fee = consultation_fee)
+            item = Patient(patient_id = user.user_id, dob = dob, gender = gender,
+                           emergency_contact = emergency_contact, blood_group = blood_group,
+                           medical_history = medical_history)
+            db.session.add(item)
+            db.session.commit()
+        else:
+            department_name = data["department_name"]
+            qualification = data["qualification"]
+            experience_years = data["experience_years"]
+            specialization = data["specialization"]
+            consultation_fee = data["consultation_fee"]
+            availabilities = data["availabilities"]
 
-        db.session.add(item)
-        db.session.commit()
+            item = Doctor(doctor_id = user.user_id, department_name = department_name,
+                          qualification = qualification, experience_years = experience_years,
+                          specialization = specialization, consultation_fee = consultation_fee)
 
-        for i in availabilities:
-            days_of_week = {"Monday":0, "Tuesday":1, "Wednesday":2, "Thursday":3,
-                            "Friday":4, "Saturday":5, "Sunday":6}
-            # Convert time strings (HH:MM) to Python time objects
-            start_time = i['start']
-            end_time = i['end']
-            if isinstance(start_time, str):
-                start_time = datetime.strptime(start_time, '%H:%M').time()
-            if isinstance(end_time, str):
-                end_time = datetime.strptime(end_time, '%H:%M').time()
-            
-            item_d = DoctorAvailability(doctor_id = user.user_id, day_of_week = days_of_week[i['day']],
-                                        start_time = start_time, end_time = end_time)
-            db.session.add(item_d)
+            db.session.add(item)
             db.session.commit()
 
-    role_obj = datastore.find_role(role)
-    datastore.add_role_to_user(user, role_obj)
+            for i in availabilities:
+                days_of_week = {"Monday":0, "Tuesday":1, "Wednesday":2, "Thursday":3,
+                                "Friday":4, "Saturday":5, "Sunday":6}
+                # Convert time strings (HH:MM) to Python time objects
+                start_time = i['start']
+                end_time = i['end']
+                if isinstance(start_time, str):
+                    start_time = datetime.strptime(start_time, '%H:%M').time()
+                if isinstance(end_time, str):
+                    end_time = datetime.strptime(end_time, '%H:%M').time()
 
-    db.session.commit()
+                item_d = DoctorAvailability(doctor_id = user.user_id, day_of_week = days_of_week[i['day']],
+                                            start_time = start_time, end_time = end_time)
+                db.session.add(item_d)
+                db.session.commit()
 
-    return jsonify({"id": user.user_id,
-                    "username": user.username,
-                    "fullname": user.fullname,
-                    "phone": user.phone,
-                    "email": user.email,
-                    "role": role,
-                    "active": active}), 200
+        role_obj = datastore.find_role(role)
+        datastore.add_role_to_user(user, role_obj)
+
+        db.session.commit()
+
+        return jsonify({"id": user.user_id,
+                        "username": user.username,
+                        "fullname": user.fullname,
+                        "phone": user.phone,
+                        "email": user.email,
+                        "role": role,
+                        "active": active}), 200
+    except Exception as e:
+        return jsonify({"message": e}), 500

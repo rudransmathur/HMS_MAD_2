@@ -54,9 +54,6 @@ export const useUserStore = defineStore('user',{
         async loginWithCredentials(endpoint='/auth/login', credentials={}){
             try {
                 const res = await api.post(endpoint, credentials);
-
-                // backend may return token in `token` or `access_token`, and user either
-                // as `user` object or individual fields. Normalize both.
                 console.log("Login response:", res);
                 const token = (res && (res.access_token || res.token));
 
@@ -76,7 +73,7 @@ export const useUserStore = defineStore('user',{
                 }
 
                 if (!token) {
-                    throw new Error("No token received from login response");
+                    throw new Error(res.message || "No token received from login response");
                 }
 
                 this.setToken(token);

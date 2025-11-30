@@ -5,7 +5,7 @@ from flask_security import current_user
 from flask_security.decorators import login_required, roles_required
 
 from .marshal_fields import user_marshal, patient_marshal, doctor_marshal
-from services import UserService, RequestService, DoctorService
+from services import UserService, RequestService, DoctorService, PatientService
 
 # Base user parser (required fields)
 parser = reqparse.RequestParser()
@@ -64,6 +64,14 @@ class DoctorResource(Resource):
         except Exception as e:
             return {'message': f'Error fetching doctors: {str(e)}'}, 500
 
+class PatientResource(Resource):
+    @staticmethod
+    def get():
+        try:
+            items = PatientService.get_all()
+            return marshal(items, patient_marshal), 200
+        except Exception as e:
+            return {'message': f'Error fetching patients: {str(e)}'}, 500
 
 class UserResource(Resource):
     @login_required

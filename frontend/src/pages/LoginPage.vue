@@ -59,7 +59,6 @@ export default {
                 });
                 this.$router.push({ path: '/' });
             } catch (err) {
-                // Display server message (extracted by api.js) or network error
                 this.error = err.message || "An error occurred during login.";
                 console.error("Login error:", err);
             } finally {

@@ -287,11 +287,16 @@ export default {
                 const payload = { ...this.patient };
 
                 const res = await api.post('/auth/register', payload);
-                console.log(res);
-                this.$router.push('/login');
+                if (res && res.data){
+                    this.$router.push('/login');
+                }
+                else{
+                    console.error("Signup error: ", res.message);
+                    this.error = res.message || "An error occurred during sign up.";
+                }
             }catch(err){
                 this.error = err.message || "An error occurred during login.";
-                console.error("Login error:", err);
+                console.error("Signup error:", err);
             }
             finally{
                 this.loading = false;
