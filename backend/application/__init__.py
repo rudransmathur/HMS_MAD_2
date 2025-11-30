@@ -1,3 +1,3 @@
 from .config import *
-from .database import *
+from .extension import *
 from .model import *
