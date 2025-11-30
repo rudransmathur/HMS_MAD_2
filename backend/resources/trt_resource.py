@@ -56,3 +56,15 @@ class TreatmentListResource(Resource):
         args = parser.parse_args()
         item = TreatmentService.create_treatment(args)
         return marshal(item, treatment_marshal), 201
+
+class PatientTreatmentResource(Resource):
+    @staticmethod
+    def get(patient_id):
+        items = TreatmentService.get_all_patient_treatments(patient_id)
+        return marshal(items, treatment_marshal), 200
+
+class DoctorTreatmentResource(Resource):
+    @staticmethod
+    def get(doctor_id):
+        items = TreatmentService.get_all_doctor_treatments(doctor_id)
+        return marshal(items, treatment_marshal), 200

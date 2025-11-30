@@ -10,6 +10,16 @@ class TreatmentService:
         return Treatment.query.all()
 
     @staticmethod
+    def get_all_patient_treatments(patient_id):
+        item = Treatment.query.filter_by(patient_id=patient_id).all()
+        return item
+
+    @staticmethod
+    def get_all_doctor_treatments(doctor_id):
+        item = Treatment.query.filter_by(doctor_id=doctor_id).all()
+        return item
+
+    @staticmethod
     def get_treatment(t_id):
         item = Treatment.query.filter_by(t_id=t_id)
         if not item:

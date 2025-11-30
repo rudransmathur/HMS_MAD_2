@@ -18,6 +18,8 @@ api.add_resource(DoctorAppointmentsResource, '/appointments/doctor/<int:doctor_i
 
 api.add_resource(TreatmentListResource, '/treatments')
 api.add_resource(TreatmentResource, '/treatment/<int:t_id>')
+api.add_resource(DoctorTreatmentResource, '/treatment/doctor/<int:doctor_id>')
+api.add_resource(PatientTreatmentResource, '/treatment/patient/<int:patient_id>')
 
 api.add_resource(UserListResource, '/users')
 api.add_resource(UserResource, '/user/<int:user_id>')

@@ -1,4 +1,4 @@
-from application.model import Doctor
+from application.model import Doctor, User
 from application.database import db
 from .service_errors import ServiceError
 from datetime import datetime
@@ -6,7 +6,8 @@ from datetime import datetime
 class DoctorService:
     @staticmethod
     def get_all():
-        return Doctor.query.all()
+        doctors = User.query.filter(User.doctor_profile != None).all()
+        return doctors
 
     @staticmethod
     def get_doctor(doctor_id):
@@ -22,8 +23,6 @@ class DoctorService:
         item = Doctor.query.filter_by(doctor_id=doctor_id).first()
         if not item:
             raise ServiceError("Doctor not found")
-        
-        # Delete related DoctorAvailability records first (cascade)
         DoctorAvailability.query.filter_by(doctor_id=doctor_id).delete()
         
         db.session.delete(item)
@@ -32,13 +31,12 @@ class DoctorService:
 
     @staticmethod
     def update_doctor(doctor_id, data):
-        """Update doctor profile with given data"""
         item = Doctor.query.filter_by(doctor_id=doctor_id).first()
         if not item:
             raise ServiceError("Doctor not found")
 
         for key in data:
-            if data[key] is not None:  # Only update non-None values
+            if data[key] is not None:
                 setattr(item, key, data[key])
 
         db.session.commit()
@@ -46,7 +44,6 @@ class DoctorService:
 
     @staticmethod
     def create_doctor(doctor_id, data):
-        """Create a new doctor profile"""
         item = Doctor.query.filter_by(doctor_id=doctor_id).first()
         if item:
             raise ServiceError("Doctor profile already exists")

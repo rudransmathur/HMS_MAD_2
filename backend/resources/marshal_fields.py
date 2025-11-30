@@ -17,6 +17,8 @@ treatment_marshal = {
     "appointment_id": fields.Integer,
     "patient_id": fields.Integer,
     "doctor_id": fields.Integer,
+    "patient_name": fields.String(attribute="patient.user.fullname"),
+    "doctor_name": fields.String(attribute="doctor.user.fullname"),
     "diagnosis": fields.String,
     "prescription": fields.String,
     "notes": fields.String,
