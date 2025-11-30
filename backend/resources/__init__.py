@@ -23,6 +23,7 @@ api.add_resource(PatientTreatmentResource, '/treatment/patient/<int:patient_id>'
 
 api.add_resource(UserListResource, '/users')
 api.add_resource(UserResource, '/user/<int:user_id>')
+api.add_resource(DoctorResource, '/doctors')
 
 api.add_resource(DoctorAvailabilityListResource, '/doctoravailability')
 api.add_resource(DoctorAvailabilityResource, '/doctoravailability/<int:doc_id>')

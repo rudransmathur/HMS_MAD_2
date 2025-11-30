@@ -26,13 +26,8 @@ def create_app():
 
     # allow requests from dev origin for all /api/* endpoints
     CORS(app, resources={r"/api/*": {"origins": ["http://localhost:5173", "http://127.0.0.1:5173"]}},
-<<<<<<< HEAD
         supports_credentials=True,
         allow_headers=["Content-Type", "Authorization", "Authentication-Token"])
-=======
-         supports_credentials=True,
-         allow_headers=["Content-Type", "Authorization"])
->>>>>>> 41b185b6bed628ebefdf242bf3df96c74a0e7835
 
     security = Security()
     datastore = SQLAlchemyUserDatastore(db, User, Role)

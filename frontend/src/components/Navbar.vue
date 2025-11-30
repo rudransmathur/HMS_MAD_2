@@ -68,8 +68,11 @@
                 <i class="bi bi-person"></i>
               </button>
               <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                <li>
-                  <router-link class="dropdown-item" to="/profile">Profile</router-link>
+                <li v-if="isPatient">
+                  <router-link class="dropdown-item" to="/patientprofile">Profile</router-link>
+                </li>
+                <li v-if="isDoctor">
+                  <router-link class="dropdown-item" to="/doctorprofile">Profile</router-link>
                 </li>
                 <li>
                   <hr class="dropdown-divider" />

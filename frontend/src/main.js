@@ -12,6 +12,8 @@ const app = createApp(App)
 app.use(createPinia())
 app.use(router)
 
-app.mount('#app')
-
+// Ensure Bootstrap JS is loaded before mounting the app so global bootstrap
+// event handlers (dropdowns, collapse, etc.) are available to components.
 import 'bootstrap/dist/js/bootstrap.js'
+
+app.mount('#app')
