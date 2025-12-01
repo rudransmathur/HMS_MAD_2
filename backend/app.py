@@ -3,9 +3,12 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_security.datastore import SQLAlchemyUserDatastore
 from flask_cors import CORS
 from dotenv import load_dotenv
+from celery import Celery
+from celery.schedules import crontab
 
 from resources import *
 from application import *
+from app_celery import celery_init_app
 
 def create_app():
     app = Flask(__name__)
@@ -39,9 +42,29 @@ def create_app():
 
     cache.init_app(app)
 
-    return app
+    app.config.from_mapping(
+        CELERY=dict(
+            broker_url="redis://localhost:6379/0",
+            result_backend="redis://localhost:6379/1",
+            timezone = 'Asia/Kolkata'
+        ),
+    )
+    celery_app = celery_init_app(app)
 
-app = create_app()
+    from tasks.test import add_func
+
+    @app.route("/celery-task")
+    def task():
+        add_func.delay(1,2)
+        return {"message":"task started"}
+    
+    @celery_app.on_after_configure.connect
+    def setup_periodic_tasks(sender, **kwargs):
+        sender.add_periodic_task(1.0, add_func.s(1,2), name='add every 10')
+
+    return app, celery_app
+
+app, celery_app = create_app()
 
 from datetime import datetime
 
