@@ -1,4 +1,4 @@
-from application.database import db
+from application.extension import db
 from flask_security import auth_required, UserMixin, RoleMixin
 import datetime
 

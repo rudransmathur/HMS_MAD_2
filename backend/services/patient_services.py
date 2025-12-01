@@ -1,5 +1,5 @@
 from application.model import User, Patient
-from application.database import db
+from application.extension import db
 from .service_errors import ServiceError
 from datetime import datetime
 
