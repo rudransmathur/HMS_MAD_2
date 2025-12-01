@@ -42,10 +42,6 @@ def create_app():
     app.register_blueprint(api_bp)
     # api.init_app(app)
 
-    # Initialize scheduler for background jobs
-    with app.app_context():
-        init_scheduler(app)
-
     app.config.from_mapping(
         CELERY=dict(
             broker_url="redis://localhost:6379/0",

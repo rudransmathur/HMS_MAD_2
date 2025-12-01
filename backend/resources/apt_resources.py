@@ -70,6 +70,7 @@ class AppointmentListResource(Resource):
 
 class PatientAppointmentsResource(Resource):
     @staticmethod
+    @cache.memoize
     def get(patient_id):
         try:
             items = AppointmentService.get_appointments_by_patient(patient_id)
@@ -83,3 +84,4 @@ class DoctorAppointmentsResource(Resource):
     def get(doctor_id):
         items = AppointmentService.get_appointments_by_doctor(doctor_id)
         return marshal(items, appointment_marshal), 200
+    
