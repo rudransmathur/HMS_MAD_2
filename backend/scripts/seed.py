@@ -21,24 +21,12 @@ from faker import Faker
 from faker_food import FoodProvider
 from sqlalchemy.exc import IntegrityError
 
-# ---- Adjust these imports to your project structure if necessary ----
-# Preferred: app factory available
-try:
-    # common pattern: application.create_app()
-    from app import create_app
-    app = create_app()
-except Exception:
-    # fallback: try importing app directly
-    try:
-        from application import app  # if your project exposes `app`
-    except Exception as e:
-        raise ImportError(
-            "Could not import Flask app. Adjust the imports at top of scripts/seed_db.py "
-            "to import your app or app factory (create_app). Original error: %s" % e
-        )
+
+from app import create_app
+app, _ = create_app()
 
 # database and models
-from application.database import db
+from application.extension import db
 from flask_security.utils import hash_password
 
 # Import models as defined in your code base (the names used in your prompt)
