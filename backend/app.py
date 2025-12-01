@@ -6,16 +6,11 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 from celery import Celery
 from celery.schedules import crontab
-import logging
 
 from application import *
 from app_celery import celery_init_app
 from resources import *
-from services.scheduled_jobs import init_scheduler
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 def create_app():
     app = Flask(__name__)
