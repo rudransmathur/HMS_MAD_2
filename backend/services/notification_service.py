@@ -21,7 +21,7 @@ class NotificationService:
     @staticmethod
     def send_reminder(patient, appointment):
         try:
-            doctor_name = appointment.doctor.user.fullname if appointment.doctor and appointment.doctor.user else "Doctor"
+            doctor_name = appointment.doctor.user.fullname
             appointment_date = str(appointment.appointment_date)
             appointment_time = str(appointment.appointment_time)
             result = NotificationService.send_email_reminder(
