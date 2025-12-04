@@ -7,9 +7,10 @@ wheels/
 *.egg-info
 
 # Virtual environments
+backend/linux.venv
 backend/.venv
 .env
 
-/backend/db_directory
+backend/db_directory/database.sqlite3
 .idea
 .python-version
