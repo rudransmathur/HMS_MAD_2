@@ -1,6 +1,7 @@
 from flask import request
 from flask import Blueprint, jsonify, request
 from flask_restful import Resource, marshal, fields, reqparse
+from application import cache
 
 from .marshal_fields import appointment_marshal
 from services import AppointmentService, ServiceError
@@ -17,6 +18,8 @@ parser.add_argument('reason', type=str, required=True)
 
 class AppointmentResource(Resource):
     @staticmethod
+
+    @cache.memoize()
     def get(ap_id):
         item = AppointmentService.get_appointment(ap_id).first()
         return marshal(item, appointment_marshal), 200
@@ -28,6 +31,7 @@ class AppointmentResource(Resource):
             return {'message': 'Appointment not found'}, 404
         args = parser.parse_args()
         args["ap_id"] = ap_id
+        cache.delete_memoized(AppointmentResource.get, AppointmentResource, id)
         AppointmentService.update_appointment(args)
 
     @staticmethod
@@ -36,6 +40,7 @@ class AppointmentResource(Resource):
         if not item:
             return {'message': 'Appointment not found'}, 404
         message = AppointmentService.delete_appointment(ap_id)
+        cache.delete_memoized(AppointmentResource.get, AppointmentResource, id)
         return message
 
     @staticmethod
@@ -45,19 +50,20 @@ class AppointmentResource(Resource):
             return {'message': 'Appointment not found'}, 404
         data = request.get_json()
         data["ap_id"] = ap_id
+        cache.delete_memoized(AppointmentResource.get, AppointmentResource, id)
         AppointmentService.update_appointment(data)
 
 
 class AppointmentListResource(Resource):
-    @staticmethod
-    def get():
+    @cache.cached(key_prefix="product_get")
+    def get(self):
         items = AppointmentService.get_all()
         return marshal(items, appointment_marshal), 200
 
-    @staticmethod
-    def post():
+    def post(self):
         args = parser.parse_args()
         item = AppointmentService.create_appointment(args)
+        cache.delete()
         return marshal(item, appointment_marshal), 201
 
 
