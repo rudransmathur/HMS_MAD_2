@@ -10,6 +10,7 @@ from celery.schedules import crontab
 from application import *
 from app_celery import celery_init_app
 from resources import *
+from application.extension import cache
 
 
 def create_app():
@@ -23,6 +24,12 @@ def create_app():
 
     # Database
     db.init_app(app)
+
+    # Configure cache (used by resources with @cache.cached / @cache.memoize)
+    # Keep defaults in sync with application.extension.Cache config
+    app.config.setdefault('CACHE_TYPE', 'RedisCache')
+    app.config.setdefault('CACHE_DEFAULT_TIMEOUT', 300)
+    cache.init_app(app)
 
     from flask_cors import CORS
 

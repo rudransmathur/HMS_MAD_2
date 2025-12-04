@@ -6,7 +6,7 @@ echo You can rerun this without any issues.
 echo ----------------------------------------------------------------------
 
 REM Check if .env folder exists
-if exist ".env" (
+if exist ".venv" (
     echo Enabling virtual environment...
 ) else (
     echo No virtual environment found. Please run setup_env.bat first.
@@ -14,7 +14,7 @@ if exist ".env" (
 )
 
 REM Activate virtual environment
-call .env\Scripts\activate
+call .venv\Scripts\activate
 
 REM Set environment variable
 set ENV=development

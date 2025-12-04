@@ -7,13 +7,9 @@
                 <p class="text-muted">Manage treatment records for your patients</p>
             </div>
             <div class="col-auto">
-                <button 
-                    class="btn btn-primary btn-lg"
-                    data-bs-toggle="modal"
-                    data-bs-target="#treatmentModal"
-                    @click="resetForm"
-                >
+                <button class="btn btn-primary btn-lg" @click="showModal = true">
                     <i class="bi bi-plus-circle"></i> New Treatment
+
                 </button>
             </div>
         </div>
@@ -47,22 +43,10 @@
                         <small class="text-muted">Patient: <strong>{{ treatment.patient_name }}</strong> | {{ formatDate(treatment.created_date) }}</small>
                     </div>
                     <div class="btn-group" role="group">
-                        <button 
-                            type="button"
-                            class="btn btn-sm btn-outline-warning"
-                            data-bs-toggle="modal"
-                            data-bs-target="#treatmentModal"
-                            @click="editTreatment(treatment)"
-                            title="Edit Treatment"
-                        >
+                        <button type="button" class="btn btn-sm btn-outline-warning me-2" @click="editTreatment(treatment)">
                             <i class="bi bi-pencil"></i> Edit
                         </button>
-                        <button 
-                            type="button"
-                            class="btn btn-sm btn-outline-danger"
-                            @click="confirmDelete(treatment)"
-                            title="Delete Treatment"
-                        >
+                        <button type="button" class="btn btn-sm btn-outline-danger" @click="confirmDelete(treatment)" title="Delete Treatment">
                             <i class="bi bi-trash"></i> Delete
                         </button>
                     </div>
@@ -74,7 +58,7 @@
                             <i class="bi bi-file-medical"></i> Diagnosis
                         </h6>
                         <div class="p-3 bg-light rounded">
-                            <p class="mb-0 text-break">{{ treatment.diagnosis || '—' }}</p>
+                            <p class="mb-0 text-break">{{ treatment.diagnosis }}</p>
                         </div>
                     </div>
 
@@ -84,7 +68,7 @@
                             <i class="bi bi-prescription2"></i> Prescription
                         </h6>
                         <div class="p-3 bg-light rounded">
-                            <p class="mb-0 text-break">{{ treatment.prescription || '—' }}</p>
+                            <p class="mb-0 text-break">{{ treatment.prescription }}</p>
                         </div>
                     </div>
 
@@ -94,7 +78,7 @@
                             <i class="bi bi-chat-left-text"></i> Notes
                         </h6>
                         <div class="p-3 bg-light rounded">
-                            <p class="mb-0 text-break">{{ treatment.notes || '—' }}</p>
+                            <p class="mb-0 text-break">{{ treatment.notes }}</p>
                         </div>
                     </div>
                 </div>
@@ -103,116 +87,80 @@
     </div>
 
     <!-- Treatment Modal -->
-    <div class="modal fade" id="treatmentModal" tabindex="-1" aria-labelledby="treatmentModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+    <div v-if="showModal" class="modal d-block" tabindex="-1" aria-labelledby="treatmentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title" id="treatmentModalLabel">
-                        <i class="bi" :class="isEditingTreatment ? 'bi-pencil-square' : 'bi-plus-circle'"></i>
-                        {{ isEditingTreatment ? 'Edit Treatment' : 'Create New Treatment' }}
+                        <i class="bi bi-pencil-square"></i>
+                        {{ isediting ? 'Edit Treatment' : 'Create New Treatment' }}
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" @click="closeModal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <!-- Patient Selection (for new treatments) -->
-                    <div v-if="!isEditingTreatment" class="mb-3">
-                        <label class="form-label fw-semibold">Select Patient</label>
-                        <select v-model="formData.patient_id" class="form-select">
-                            <option value="">-- Choose a patient --</option>
-                            <option v-for="patient in availablePatients" :key="patient.patient_id" :value="patient.patient_id">
-                                {{ patient.patient_name }} (Appointment {{ patient.ap_id }})
-                            </option>
-                        </select>
-                    </div>
+                    <form @submit.prevent="saveform">
+                        <!-- Patient Selection (for new treatments) -->
+                        <div v-if="!isediting" class="mb-3">
+                            <label for = "patient" class="form-label fw-semibold">Select Patient</label>
+                            <select v-model="formData.patient_id" id = "patient" class="form-select">
+                                <option value="">-- Choose a patient --</option>
+                                <option v-for="patient in availablePatients" :key="patient.patient_id" :value="patient.patient_id">
+                                    {{ patient.patient_name }} (Appointment {{ patient.ap_id }})
+                                </option>
+                            </select>
+                        </div>
 
-                    <!-- Appointment Selection -->
-                    <div v-if="!isEditingTreatment" class="mb-3">
-                        <label class="form-label fw-semibold">Associated Appointment</label>
-                        <input 
-                            v-model="formData.appointment_id" 
-                            type="number"
-                            class="form-control"
-                            placeholder="Appointment ID"
-                        >
-                    </div>
+                        <!-- Appointment Selection -->
+                        <div v-if="!isediting" class="mb-3">
+                            <label for = "appointment" class="form-label fw-semibold">Associated Appointment</label>
+                            <input id = "appointment" v-model="formData.appointment_id" type="number" class="form-control" placeholder="Appointment ID">
+                        </div>
 
-                    <!-- Diagnosis -->
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Diagnosis</label>
-                        <textarea 
-                            v-model="formData.diagnosis"
-                            class="form-control"
-                            rows="3"
-                            placeholder="Enter the patient's diagnosis..."
-                            required
-                        ></textarea>
-                    </div>
+                        <!-- Diagnosis -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Diagnosis</label>
+                            <textarea 
+                                v-model="formData.diagnosis"
+                                class="form-control"
+                                rows="3"
+                                placeholder="Enter the patient's diagnosis..."
+                                required
+                            ></textarea>
+                        </div>
 
-                    <!-- Prescription -->
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Prescription</label>
-                        <textarea 
-                            v-model="formData.prescription"
-                            class="form-control"
-                            rows="3"
-                            placeholder="Enter prescribed medications and dosage..."
-                            required
-                        ></textarea>
-                    </div>
+                        <!-- Prescription -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Prescription</label>
+                            <textarea 
+                                v-model="formData.prescription"
+                                class="form-control"
+                                rows="3"
+                                placeholder="Enter prescribed medications and dosage..."
+                                required
+                            ></textarea>
+                        </div>
 
-                    <!-- Notes -->
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Additional Notes</label>
-                        <textarea 
-                            v-model="formData.notes"
-                            class="form-control"
-                            rows="3"
-                            placeholder="Any additional notes or recommendations..."
-                        ></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button 
-                        type="button" 
-                        class="btn btn-primary"
-                        @click="saveTreatment"
-                        :disabled="isSaving"
-                    >
-                        <span v-if="!isSaving">
-                            <i class="bi bi-check"></i> {{ isEditingTreatment ? 'Update' : 'Create' }}
-                        </span>
-                        <span v-else>
-                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                            Saving...
-                        </span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Delete Confirmation Modal -->
-    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-sm">
-            <div class="modal-content border-danger">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title"><i class="bi bi-exclamation-triangle"></i> Delete Treatment</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to delete this treatment record? This action cannot be undone.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button 
-                        type="button" 
-                        class="btn btn-danger"
-                        @click="deleteTreatment"
-                        :disabled="isSaving"
-                    >
-                        <i class="bi bi-trash"></i> Delete
-                    </button>
+                        <!-- Notes -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Additional Notes</label>
+                            <textarea 
+                                v-model="formData.notes"
+                                class="form-control"
+                                rows="3"
+                                placeholder="Any additional notes or recommendations..."
+                            ></textarea>
+                        </div>
+                        <button type="button" class="btn btn-secondary" @click="closeModal">Cancel</button>
+                        <button type="submit" class="btn btn-primary" :disabled="isSaving">
+                            <span v-if="!isSaving">
+                                {{ isediting ? 'Update' : 'Create' }}
+                            </span>
+                            <span v-else>
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                Saving...
+                            </span>
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -222,7 +170,6 @@
 <script>
 import api from '@/utils/api';
 import useUserStore from '@/stores/user';
-// Use global bootstrap that is imported in main.js
 
 export default {
     name: 'DoctorDiagnosisPage',
@@ -233,7 +180,8 @@ export default {
             treatments: [],
             availablePatients: [],
             userStore: null,
-            isEditingTreatment: false,
+            showModal: false,
+            isediting: false,
             isSaving: false,
             formData: {
                 t_id: null,
@@ -242,22 +190,13 @@ export default {
                 diagnosis: '',
                 prescription: '',
                 notes: ''
-            },
-            treatmentToDelete: null,
-            deleteModal: null,
+            }
         };
     },
     created(){
         this.userStore = useUserStore();
         this.fetchTreatments();
         this.fetchAvailablePatients();
-    },
-    mounted(){
-        // Initialize modal references for manual control using global bootstrap
-        const deleteConfirmElement = document.getElementById('deleteConfirmModal');
-        if (deleteConfirmElement && window && window.bootstrap && window.bootstrap.Modal) {
-            this.deleteModal = new window.bootstrap.Modal(deleteConfirmElement);
-        }
     },
     methods: {
         async fetchTreatments() {
@@ -284,7 +223,6 @@ export default {
                 const response = await api.get(`/appointments/doctor/${this.userStore.user.id}`);
                 const appointments = Array.isArray(response) ? response : (response ? [response] : []);
                 
-                // Extract unique patients from appointments
                 const patientMap = {};
                 appointments.forEach(apt => {
                     if (apt.patient_id && apt.patient_name) {
@@ -301,19 +239,8 @@ export default {
                 console.error("Failed to fetch available patients:", err);
             }
         },
-        resetForm() {
-            this.isEditingTreatment = false;
-            this.formData = {
-                t_id: null,
-                patient_id: '',
-                appointment_id: '',
-                diagnosis: '',
-                prescription: '',
-                notes: ''
-            };
-        },
         editTreatment(treatment) {
-            this.isEditingTreatment = true;
+            this.isediting = true;
             this.formData = {
                 t_id: treatment.t_id,
                 patient_id: treatment.patient_id || '',
@@ -322,16 +249,30 @@ export default {
                 prescription: treatment.prescription || '',
                 notes: treatment.notes || ''
             };
+            this.error = "";
+            this.showModal = true;
         },
-        async saveTreatment() {
+        closeModal() {
+            this.showModal = false;
+            this.isediting = false;
+            this.formData = {
+                t_id: null,
+                patient_id: '',
+                appointment_id: '',
+                diagnosis: '',
+                prescription: '',
+                notes: ''
+            };
+            this.error = "";
+        },
+        async saveform() {
             try {
-                // Validate required fields
                 if (!this.formData.diagnosis || !this.formData.prescription) {
                     this.error = "Diagnosis and Prescription are required";
                     return;
                 }
 
-                if (!this.isEditingTreatment && (!this.formData.patient_id || !this.formData.appointment_id)) {
+                if (!this.isediting && (!this.formData.patient_id || !this.formData.appointment_id)) {
                     this.error = "Patient and Appointment are required for new treatments";
                     return;
                 }
@@ -346,51 +287,33 @@ export default {
                     notes: this.formData.notes
                 };
 
-                if (this.isEditingTreatment) {
-                    // Update existing treatment
+                if (this.isediting) {
                     await api.patch(`/treatment/${this.formData.t_id}`, payload);
                     this.successMessage = "Treatment updated successfully!";
                 } else {
-                    // Create new treatment
                     await api.post('/treatments', payload);
                     this.successMessage = "Treatment created successfully!";
                 }
-
-                // Close modal and refresh
-                const modal = Modal.getInstance(document.getElementById('treatmentModal'));
-                if (modal) modal.hide();
-                
-                setTimeout(() => {
-                    this.fetchTreatments();
-                    this.error = '';
-                }, 500);
+                this.closeModal();
+                this.fetchTreatments();
             } catch (err) {
                 this.error = err.message || "Failed to save treatment";
+                console.error("error", err);
             } finally {
                 this.isSaving = false;
             }
         },
-        confirmDelete(treatment) {
-            this.treatmentToDelete = treatment;
-            this.deleteModal.show();
-        },
-        async deleteTreatment() {
+        async confirmDelete(treatment) {
+            if (!window.confirm("Are you sure you want to delete this Treatment?")) {
+                return;
+            }
+
             try {
-                if (!this.treatmentToDelete) return;
-                
-                this.isSaving = true;
-                await api.delete(`/treatment/${this.treatmentToDelete.t_id}`);
-                this.successMessage = "Treatment deleted successfully!";
-                
-                this.deleteModal.hide();
-                setTimeout(() => {
-                    this.fetchTreatments();
-                    this.treatmentToDelete = null;
-                }, 500);
+                await api.delete(`/treatment/${treatment.t_id}`);
+                await this.fetchTreatments();
             } catch (err) {
                 this.error = err.message || "Failed to delete treatment";
-            } finally {
-                this.isSaving = false;
+                console.error("error:", err);
             }
         },
         formatDate(dateStr) {
@@ -413,6 +336,16 @@ export default {
 </script>
 
 <style scoped>
+.modal.d-block {
+    display: block !important;
+}
+
+.modal-dialog-centered {
+    display: flex;
+    align-items: center;
+    min-height: calc(100% - 1rem);
+}
+
 .card {
     border: none;
     border-radius: 0.5rem;

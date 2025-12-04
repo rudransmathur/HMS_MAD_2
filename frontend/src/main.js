@@ -14,6 +14,6 @@ app.use(router)
 
 // Ensure Bootstrap JS is loaded before mounting the app so global bootstrap
 // event handlers (dropdowns, collapse, etc.) are available to components.
-import 'bootstrap/dist/js/bootstrap.js'
+import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 
 app.mount('#app')

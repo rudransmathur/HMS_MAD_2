@@ -4,7 +4,7 @@ from flask import Blueprint
 from .auth_resources import auth_bp
 from .apt_resources import AppointmentResource, AppointmentListResource, PatientAppointmentsResource, DoctorAppointmentsResource
 from .trt_resource import TreatmentResource, TreatmentListResource, PatientTreatmentResource, DoctorTreatmentResource
-from .user_resources import UserResource, UserListResource, DoctorResource, PatientResource, approve_user
+from .user_resources import UserResource, UserListResource, DoctorResource, PatientResource, activate_user, deactivate_user
 from .dct_aval_resources import DoctorAvailabilityResource, DoctorAvailabilityListResource
 from .rqt_resources import RequestResource, RequestListResource
 
@@ -32,4 +32,5 @@ api.add_resource(DoctorAvailabilityResource, '/doctoravailability/<int:doc_id>')
 api.add_resource(RequestListResource, '/requests')
 api.add_resource(RequestResource, '/requests/<int:r_id>')
 
-api_bp.add_url_rule("/user/<int:user_id>/approve", view_func=approve_user, methods=['PATCH'])
+api_bp.add_url_rule("/user/<int:user_id>/activate", view_func=activate_user, methods=['PATCH'])
+api_bp.add_url_rule("/user/<int:user_id>/deactivate", view_func=deactivate_user, methods=['PATCH'])

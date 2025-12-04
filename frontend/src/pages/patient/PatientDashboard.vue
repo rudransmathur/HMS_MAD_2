@@ -6,19 +6,18 @@
             <p class="text-muted">Manage your appointments and healthcare needs</p>
         </div>
 
-        <!-- Error Alert -->
+        <!-- Error -->
         <div v-if="error" class="alert alert-danger alert-dismissible fade show" role="alert">
             {{ error }}
-            <button type="button" class="btn-close" @click="error = ''"></button>
         </div>
 
-        <!-- Appointments Section -->
+        <!-- Appointments -->
         <div class="card shadow-lg mb-5">
             <div class="card-header bg-primary text-white">
                 <h3 class="mb-0"><i class="bi bi-calendar-check"></i> Your Appointments</h3>
             </div>
             <div class="card-body">
-                <!-- No Appointments Message -->
+                <!-- No Appointments  -->
                 <div v-if="appointments.length === 0" class="text-center py-5">
                     <i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
                     <p class="text-muted mt-3">You haven't booked any appointments yet.</p>
@@ -68,13 +67,13 @@
 
         <!-- Book Appointment Button -->
         <div class="text-center mb-5">
-            <button class="btn btn-primary btn-lg" @click="showAddModal = true">
+            <button class="btn btn-primary btn-lg" @click="showModal = true">
                 <i class="bi bi-plus-circle"></i> Book Appointment
             </button>
         </div>
 
         <!-- Add/Edit Appointment Modal -->
-        <div v-if="showAddModal" class="modal d-block" style="background-color: rgba(0,0,0,0.5);">
+        <div v-if="showModal" class="modal d-block" style="background-color: rgba(0,0,0,0.5);">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header bg-primary text-white">
@@ -112,17 +111,6 @@
                                 <textarea v-model="formData.reason" id="reason" class="form-control" rows="3" placeholder="Describe your symptoms or reason" required></textarea>
                             </div>
 
-                            <!-- Status (only for edit) -->
-                            <div v-if="editingAppointment" class="mb-3">
-                                <label for="status" class="form-label fw-semibold">Status</label>
-                                <select v-model="formData.status" id="status" class="form-select">
-                                    <option value="Pending">Pending</option>
-                                    <option value="Confirmed">Confirmed</option>
-                                    <option value="Completed">Completed</option>
-                                    <option value="Cancelled">Cancelled</option>
-                                </select>
-                            </div>
-
                             <!-- Form Actions -->
                             <div class="d-flex gap-2">
                                 <button type="submit" class="btn btn-primary flex-grow-1" :disabled="isSubmitting">
@@ -152,7 +140,7 @@ export default {
             appointments: [],
             doctors: [],
             userStore: null,
-            showAddModal: false,
+            showModal: false,
             editingAppointment: null,
             isSubmitting: false,
             formData: {
@@ -223,10 +211,10 @@ export default {
                 reason: appointment.reason,
                 status: appointment.status
             };
-            this.showAddModal = true;
+            this.showModal = true;
         },
         closeModal() {
-            this.showAddModal = false;
+            this.showModal = false;
             this.editingAppointment = null;
             this.formData = {
                 doctor_id: "",

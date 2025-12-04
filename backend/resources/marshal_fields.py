@@ -14,6 +14,7 @@ appointment_marshal = {
 }
 
 treatment_marshal = {
+    "t_id": fields.Integer,
     "appointment_id": fields.Integer,
     "patient_id": fields.Integer,
     "doctor_id": fields.Integer,

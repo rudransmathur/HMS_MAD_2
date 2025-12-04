@@ -34,6 +34,7 @@
                                     <th><i class="bi bi-clock"></i> Time</th>
                                     <th><i class="bi bi-info-circle"></i> Status</th>
                                     <th><i class="bi bi-chat"></i> Reason</th>
+                                    <th><i class="bi bi-info-circle"> Change Status</i></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -47,6 +48,14 @@
                                         </span>
                                     </td>
                                     <td>{{ appointment.reason || "—" }}</td>
+                                    <td>
+                                        <select class="form-select form-select-sm" v-model="appointment.status" @change="changestatus(appointment)">
+                                            <option value="Pending">Pending</option>
+                                            <option value="Confirmed">Confirmed</option>
+                                            <option value="Cancelled">Cancelled</option>
+                                            <option value="Completed">Completed</option>
+                                        </select>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -62,7 +71,7 @@ import api from '@/utils/api';
 import useUserStore from '@/stores/user';
 
 export default {
-    name: "PatientDashboard",
+    name: "DoctorDashboard",
     data() {
         return {
             error: "",
@@ -108,6 +117,24 @@ export default {
             } catch (err) {
                 this.error = "Failed to fetch doctors: " + (err.message || "Unknown error");
                 console.error("Failed to fetch doctors:", err);
+            }
+        },
+        async changestatus(appointment) {
+            try {
+                const payload = {
+                    status: appointment.status
+                };
+                const res = api.patch(`/appointments/${appointment.ap_id}`, payload);
+                if (res.message) {
+                    this.error = res.message;
+                    console.error("Status update error:", res.message);
+                }
+                else {
+                    console.log("Status updated:", appointment.status);
+                }
+            } catch (err) {
+                this.error = "Failed to update appointment status";
+                console.error("Status update failed:", err);
             }
         },
         formatDate(dateStr) {

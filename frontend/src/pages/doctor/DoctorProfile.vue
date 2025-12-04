@@ -30,25 +30,15 @@
 							<input class="form-control" v-model="form.fullname" />
 						</div>
 
-						<div class="col-md-4">
+						<div class="col-md-6">
 							<label class="form-label">Email</label>
 							<input class="form-control" v-model="form.email" type="email" />
 						</div>
-						<div class="col-md-4">
+						<div class="col-md-6">
 							<label class="form-label">Phone</label>
 							<input class="form-control" v-model="form.phone" type="tel" />
 						</div>
-						<div class="col-md-4 d-flex align-items-center">
-							<div>
-								<label class="form-label">Active</label>
-								<div>
-									<input type="checkbox" v-model="form.active" /> <span class="ms-2">Account active</span>
-								</div>
-							</div>
-						</div>  
-
 						<hr class="my-3" />
-
 						<div class="col-md-6">
 							<label class="form-label">Department (id or name)</label>
 							<input class="form-control" v-model="form.department_name" />
@@ -72,7 +62,7 @@
 						</div>
 
 						<div class="col-12 mt-3 d-flex gap-2">
-							<button class="btn btn-primary" :disabled="isSaving">Save</button>
+							<button class="btn btn-primary" :disabled="isSaving">Request Change</button>
 							<button type="button" class="btn btn-outline-secondary" @click="cancel">Cancel</button>
 						</div>
 					</div>
@@ -144,7 +134,6 @@ export default {
 			}
 		},
 		cancel() {
-			// reset form to original profile values
 			if (this.profile) this.fetchProfile();
 		},
 		async saveProfile() {
@@ -156,25 +145,21 @@ export default {
 					return;
 				}
 
-				// Build payload - include both user and doctor fields
-				const payload = {
-					username: this.form.username,
-					fullname: this.form.fullname,
-					phone: this.form.phone,
-					email: this.form.email,
-					active: this.form.active,
-					// doctor fields
-					department_name: this.form.department_name,
-					qualification: this.form.qualification,
-					experience_years: this.form.experience_years,
-					specialization: this.form.specialization,
-					consultation_fee: this.form.consultation_fee,
-					is_active: this.form.is_active
-				};
+				// Only include changed fields
+				const payload = {};
+				const fields = [
+					'username', 'fullname', 'phone', 'email', 'active',
+					'department_name', 'qualification', 'experience_years',
+					'specialization', 'consultation_fee', 'is_active'
+				];
+				fields.forEach(key => {
+					if (this.form[key] !== this.profile[key]) {
+						payload[key] = this.form[key];
+					}
+				});
 
 				await api.patch(`/user/${id}`, payload);
-				this.successMessage = 'Profile updated successfully.';
-				// refresh
+				this.successMessage = 'Requst to change profile sent successfully.';
 				await this.fetchProfile();
 				setTimeout(() => (this.successMessage = ''), 3000);
 			} catch (err) {

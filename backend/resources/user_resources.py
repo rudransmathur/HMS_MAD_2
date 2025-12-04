@@ -252,6 +252,10 @@ class UserListResource(Resource):
         return marshal(items, user_marshal), 200
 
 
-def approve_user(user_id):
+def activate_user(user_id):
     user = UserService.update_user({"active": True, "user_id": user_id})
+    return {"message": f"Updated id {user_id}"}, 200
+
+def deactivate_user(user_id):
+    user = UserService.update_user({"active": False, "user_id": user_id})
     return {"message": f"Updated id {user_id}"}, 200

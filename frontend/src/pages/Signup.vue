@@ -287,7 +287,7 @@ export default {
                 const payload = { ...this.patient };
 
                 const res = await api.post('/auth/register', payload);
-                if (res && res.data){
+                if (res && res.id){
                     this.$router.push('/login');
                 }
                 else{
@@ -314,7 +314,12 @@ export default {
                 const payload = { ...this.doctor };
 
                 const res = await api.post('/auth/register', payload);
+                if (res && res.id)
                 this.$router.push('/login');
+                else{
+                    console.error("Login error: ", res.message);
+                    this.error = res.message || "An error occurred during sign up.";
+                }
             }catch(err){
                 this.error = err.message || "An error occurred during sign up.";
                 console.error("Login error:", err);

@@ -16,7 +16,6 @@
 					<option value="all">All roles</option>
 					<option value="doctor">Doctor</option>
 					<option value="patient">Patient</option>
-					<option value="other">Other</option>
 				</select>
 			</div>
 			<div class="col-md-3 text-end">
@@ -46,19 +45,19 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr v-for="u in filteredUsers" :key="u.user_id || u.id">
-						<td>{{ u.user_id || u.id }}</td>
-						<td>{{ u.username }}</td>
-						<td>{{ u.fullname }}</td>
-						<td>{{ u.phone }}</td>
-						<td>{{ u.email }}</td>
+					<tr v-for="u in filteredUsers" :key="u && u.user_id">
+						<td>{{ u && u.user_id || '' }}</td>
+						<td>{{ u && u.username }}</td>
+						<td>{{ u && u.fullname }}</td>
+						<td>{{ u && u.phone }}</td>
+						<td>{{ u && u.email }}</td>
 						<td>
-							<span v-if="u.active" class="badge bg-success">Yes</span>
+							<span v-if="u && u.active" class="badge bg-success">Yes</span>
 							<span v-else class="badge bg-secondary">No</span>
 						</td>
 						<td class="text-end">
-							<button class="btn btn-sm btn-outline-primary me-2" @click="openEdit(u)" :disabled="!isDoctor(u)">Edit</button>
-							<button class="btn btn-sm btn-outline-danger" @click="confirmDelete(u)" :disabled="!isDoctor(u)">Delete</button>
+							<button class="btn btn-sm btn-outline-primary me-2" @click="openEdit(u)">Edit</button>
+							<button v-if="isDoctor(u)" class="btn btn-sm btn-outline-danger" @click="confirmDelete(u)">Delete</button>
 						</td>
 					</tr>
 				</tbody>
@@ -77,15 +76,15 @@
 						<div class="modal-body">
 							<div v-if="editError" class="alert alert-danger">{{ editError }}</div>
 							<div class="row g-3">
-								<div class="col-md-6">
+								<div v-if = "isDoctor(editingfor)" class="col-md-6">
 									<label class="form-label">Full name</label>
 									<input class="form-control" v-model="editForm.fullname" />
 								</div>
-								<div class="col-md-6">
+								<div v-if = "isDoctor(editingfor)" class="col-md-6">
 									<label class="form-label">Email</label>
 									<input class="form-control" v-model="editForm.email" type="email" />
 								</div>
-								<div class="col-md-6">
+								<div v-if = "isDoctor(editingfor)" class="col-md-6">
 									<label class="form-label">Phone</label>
 									<input class="form-control" v-model="editForm.phone" />
 								</div>
@@ -123,7 +122,8 @@ export default {
 			editing: false,
 			editForm: null,
 			saving: false,
-			editError: ''
+			editError: '',
+			editingfor: ""
 		};
 	},
 	computed: {
@@ -139,11 +139,13 @@ export default {
 		},
 		filteredUsers() {
 			const q = (this.q || '').toLowerCase().trim();
-			return this.usersWithRole.filter(u => {
-				if (this.roleFilter !== 'all' && u.role !== this.roleFilter) return false;
-				if (!q) return true;
-				return (u.fullname || '').toLowerCase().includes(q) || (u.username || '').toLowerCase().includes(q);
-			});
+			return this.usersWithRole
+				.filter(u => u && u.user_id !== 1) // Exclude user_id 1 here
+				.filter(u => {
+					if (this.roleFilter !== 'all' && u.role !== this.roleFilter) return false;
+					if (!q) return true;
+					return (u.fullname || '').toLowerCase().includes(q) || (u.username || '').toLowerCase().includes(q);
+				});
 		}
 	},
 	created() {
@@ -172,14 +174,15 @@ export default {
 			return this.doctorIds.has(id);
 		},
 		openEdit(u) {
-			if (!this.isDoctor(u)) return;
 			this.editForm = { ...u };
 			this.editing = true;
+			this.editingfor = u
 			this.editError = '';
 		},
 		closeEdit() {
 			this.editing = false;
 			this.editForm = null;
+			this.editingfor = "";
 		},
 		async saveEdit() {
 			try {
@@ -193,7 +196,15 @@ export default {
 					email: this.editForm.email,
 					active: this.editForm.active
 				};
-				await api.patch(`/user/${id}`, payload);
+				if (!this.isDoctor(this.editForm) && this.editForm.active) {
+					await api.patch(`/user/${id}/activate`, payload);
+				}
+				else if (!this.isDoctor(this.editForm) && !this.editForm.active) {
+					await api.patch(`/user/${id}/deactivate`, payload);
+				}
+				else{
+					await api.patch(`/user/${id}`, payload);
+				}
 				await this.loadAll();
 				this.closeEdit();
 			} catch (e) {

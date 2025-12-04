@@ -6,15 +6,15 @@ echo You can rerun this without any issues.
 echo ----------------------------------------------------------------------
 
 REM Check if .env folder exists
-if exist ".env" (
-    echo .env folder exists. Installing using pip...
+if exist ".venv" (
+    echo .venv folder exists. Installing using pip...
 ) else (
-    echo Creating .env and installing using pip...
-    python -m venv .env
+    echo Creating .venv and installing using pip...
+    python -m venv .venv
 )
 
 REM Activate virtual environment
-call .env\Scripts\activate
+call .venv\Scripts\activate
 
 REM Install required packages
 if exist "requirements.txt" (
@@ -27,7 +27,7 @@ REM Initalise Database
 python -m scripts.seed
 
 REM Deactivate virtual environment
-deactivate
+call .venv\Scripts\deactivate
 
 echo ----------------------------------------------------------------------
 echo Setup complete!
