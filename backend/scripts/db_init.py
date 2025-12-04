@@ -1,9 +1,9 @@
 from app import app
-from application.database import db
+from application.extension import db
 from flask_security.datastore import SQLAlchemyUserDatastore
 from flask_security.utils import hash_password
 
-from application.database import db
+from application.extension import db
 from application.model import Role
 
 with app.app_context():
