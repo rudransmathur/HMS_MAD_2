@@ -55,7 +55,7 @@ class AppointmentResource(Resource):
 
 
 class AppointmentListResource(Resource):
-    @cache.cached(key_prefix="product_get")
+    @cache.cached(key_prefix="apt_get")
     def get(self):
         items = AppointmentService.get_all()
         return marshal(items, appointment_marshal), 200
@@ -63,7 +63,7 @@ class AppointmentListResource(Resource):
     def post(self):
         args = parser.parse_args()
         item = AppointmentService.create_appointment(args)
-        cache.delete()
+        cache.delete("apt_get")
         return marshal(item, appointment_marshal), 201
 
 
