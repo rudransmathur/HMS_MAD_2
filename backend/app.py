@@ -72,13 +72,11 @@ def task():
 
 @celery_app.on_after_configure.connect
 def periodic_task(sender:Celery, **kwargs):
-    sender.add_periodic_task(10.0, add_func(1,5), name='add every 10')
-
-    sender.add_periodic_task(30.0, add_func(2,3), expires=10)
-
+    sender.add_periodic_task(10.0, add_func.s(1,5), name='add every 10')
+    sender.add_periodic_task(30.0, add_func.s(2,3), expires=10)
     sender.add_periodic_task(
         crontab(minute=22,hour=23,day_of_week=1,),
-        add_func(10,10)
+        add_func.s(10,10)
     )
 
 if __name__ == "__main__":
