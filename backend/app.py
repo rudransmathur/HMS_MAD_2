@@ -19,36 +19,36 @@ def create_app():
     # Load .env file contents
     load_dotenv()
 
-    # configure local development
+    # Configure local development
     app.config.from_object(LocalDevConfig)
 
-    # Database
+    # Configure Database
     db.init_app(app)
 
-    # Configure cache (used by resources with @cache.cached / @cache.memoize)
-    # Keep defaults in sync with application.extension.Cache config
+    # Configure cache
     app.config.setdefault('CACHE_TYPE', 'RedisCache')
     app.config.setdefault('CACHE_DEFAULT_TIMEOUT', 300)
     cache.init_app(app)
 
+    # CORS
     from flask_cors import CORS
 
-    # allow requests from dev origin for all /api/* endpoints
     CORS(app, resources={r"/api/*": {"origins": ["http://localhost:5173", "http://127.0.0.1:5173"]}},
         supports_credentials=True,
         allow_headers=["Content-Type", "Authorization", "Authentication-Token"])
 
+    # Security
     security = Security()
     datastore = SQLAlchemyUserDatastore(db, User, Role)
     security.init_app(app, datastore=datastore)
 
-    # register_blueprint = False
     app.datastore = datastore
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(api_bp)
-    # api.init_app(app)
 
+
+    # Backend celery configuraation
     app.config.from_mapping(
         CELERY=dict(
             broker_url="redis://localhost:6379/0",
@@ -58,20 +58,28 @@ def create_app():
     )
     celery_app = celery_init_app(app)
 
-    from tasks.test import add_func
-
-    @app.route("/celery-task")
-    def task():
-        add_func.delay(1,2)
-        return {"message":"task started"}
-    
-    @celery_app.on_after_configure.connect
-    def setup_periodic_tasks(sender, **kwargs):
-        sender.add_periodic_task(1.0, add_func.s(1,2), name='add every 10')
-
     return app, celery_app
 
+
 app, celery_app = create_app()
+
+from tasks.test import add_func
+@app.route("/celery-task")
+def task():
+    add_func.delay(1,2)
+    return {"message": "task started"}
+
+
+@celery_app.on_after_configure.connect
+def periodic_task(sender:Celery, **kwargs):
+    sender.add_periodic_task(10.0, add_func(1,5), name='add every 10')
+
+    sender.add_periodic_task(30.0, add_func(2,3), expires=10)
+
+    sender.add_periodic_task(
+        crontab(minute=22,hour=23,day_of_week=1,),
+        add_func(10,10)
+    )
 
 if __name__ == "__main__":
     app.run()

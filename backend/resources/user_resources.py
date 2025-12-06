@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify, request
 from flask_restful import Resource, marshal, fields, reqparse
 from flask_security import current_user
 from flask_security.decorators import login_required, roles_required
+from application import cache
 
 from .marshal_fields import user_marshal, patient_marshal, doctor_marshal
 from services import UserService, RequestService, DoctorService, PatientService
@@ -75,6 +76,7 @@ class PatientResource(Resource):
 
 class UserResource(Resource):
     @login_required
+    @cache.memoize()
     def get(self, user_id):
         item = UserService.get_user(user_id).first()
         if not item:
@@ -159,7 +161,8 @@ class UserResource(Resource):
                 UserService.update_user(args)
                 refreshed = UserService.get_user(user_id).first()
                 return marshal(refreshed, user_marshal), 200
-
+        cache.delete_memoized(UserResource.get, UserResource, user_id)
+        cache.delete("user_get")
         return {'message': 'You are not authorized to edit'}, 401
 
     # Doctor any delete request (self or other) → creates a delete request
@@ -190,7 +193,8 @@ class UserResource(Resource):
 
             message = UserService.delete_user(user_id)
             return message, 200
-
+        cache.delete_memoized(UserResource.get, UserResource, user_id)
+        cache.delete("user_get")
         return {'message': 'You are not authorized to delete'}, 401
 
     # Only admin can do for doctors and patient can do for themselves.
@@ -240,12 +244,15 @@ class UserResource(Resource):
                 refreshed = UserService.get_user(user_id).first()
                 return marshal(refreshed, user_marshal), 200
 
+        cache.delete_memoized(UserResource.get, UserResource, user_id)
+        cache.delete("user_get")
         return {'message': 'You are not authorized to edit'}, 401
 
 
 class UserListResource(Resource):
     @staticmethod
     @roles_required("admin")
+    @cache.cached(key_prefix="user_get")
     def get():
         # only by admin
         items = UserService.get_all()

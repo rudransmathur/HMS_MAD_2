@@ -32,6 +32,7 @@ class AppointmentResource(Resource):
         args = parser.parse_args()
         args["ap_id"] = ap_id
         cache.delete_memoized(AppointmentResource.get, AppointmentResource, id)
+        cache.delete("apt_get")
         AppointmentService.update_appointment(args)
 
     @staticmethod
@@ -41,6 +42,7 @@ class AppointmentResource(Resource):
             return {'message': 'Appointment not found'}, 404
         message = AppointmentService.delete_appointment(ap_id)
         cache.delete_memoized(AppointmentResource.get, AppointmentResource, id)
+        cache.delete("apt_get")
         return message
 
     @staticmethod
@@ -51,6 +53,7 @@ class AppointmentResource(Resource):
         data = request.get_json()
         data["ap_id"] = ap_id
         cache.delete_memoized(AppointmentResource.get, AppointmentResource, id)
+        cache.delete("apt_get")
         AppointmentService.update_appointment(data)
 
 
@@ -63,6 +66,7 @@ class AppointmentListResource(Resource):
     def post(self):
         args = parser.parse_args()
         item = AppointmentService.create_appointment(args)
+        cache.delete_memoized(AppointmentResource.get, AppointmentResource, id)
         cache.delete("apt_get")
         return marshal(item, appointment_marshal), 201
 
