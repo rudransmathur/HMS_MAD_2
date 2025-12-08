@@ -10,7 +10,6 @@ def celery_init_app(app):
     celery_app.config_from_object(app.config["CELERY"])
     celery_app.set_default()
 
-    # ⭐ Important for shared_task
     celery_app.autodiscover_tasks(['tasks'])
 
     app.extensions["celery"] = celery_app

@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_security import Security
 from flask_security.datastore import SQLAlchemyUserDatastore
@@ -19,8 +19,14 @@ def create_app():
     # Load .env file contents
     load_dotenv()
 
-    # Configure local development
-    app.config.from_object(LocalDevConfig)
+    # Configure enviornment
+    if os.getenv('ENV', "development") == "production":
+        app.logger.info("Currently no production config is set up")
+    else:
+        app.logger.info("Starting Local Development.")
+        app.config.from_object(LocalDevConfig)
+
+    mail.init_app(app)
 
     # Configure Database
     db.init_app(app)
@@ -47,7 +53,6 @@ def create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(api_bp)
 
-
     # Backend celery configuraation
     app.config.from_mapping(
         CELERY=dict(
@@ -63,21 +68,33 @@ def create_app():
 
 app, celery_app = create_app()
 
-from tasks.test import add_func
-@app.route("/celery-task")
-def task():
-    add_func.delay(1,2)
-    return {"message": "task started"}
+from tasks.daily import daily_reminder
+from tasks.monthly import monthly_doctor_report, export_treatments_csv
+
+
+
+@app.route("/api/export-treatments/<int:patient_id>", methods=['POST'])
+def export_treatments(patient_id):
+
+    export_treatments_csv.delay(patient_id)
+
+    return jsonify({"message": "Export started. You will receive an email once done."}), 202
 
 
 @celery_app.on_after_configure.connect
 def periodic_task(sender:Celery, **kwargs):
-    sender.add_periodic_task(10.0, add_func.s(1,5), name='add every 10')
-    sender.add_periodic_task(30.0, add_func.s(2,3), expires=10)
     sender.add_periodic_task(
-        crontab(minute=22,hour=23,day_of_week=1,),
-        add_func.s(10,10)
+        crontab(minute=0,hour=8),
+        daily_reminder.s(),
+        name='appointment reminder at 8am'
     )
+
+    sender.add_periodic_task(
+        crontab(minute=00,hour=7,day_of_month=1),
+        monthly_doctor_report.s(),
+        name='monthly doctor report'
+    )
+
 
 if __name__ == "__main__":
     app.run()

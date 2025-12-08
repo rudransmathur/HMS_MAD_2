@@ -12,6 +12,11 @@
             <button type="button" class="btn-close" @click="error = ''"></button>
         </div>
 
+        <div>
+            <button class="btn btn-outline-primary mb-4" @click="sendtreatments">Send Treatment Reports to Mail
+            </button>
+        </div>
+
         <!-- No Treatments Message -->
         <div v-if="treatments.length === 0" class="alert alert-info text-center py-5">
             <i class="bi bi-file-earmark-medical" style="font-size: 3rem; color: #0d6efd;"></i>
@@ -95,6 +100,19 @@ export default {
         this.fetchTreatments();
     },
     methods: {
+        async sendtreatments() {
+            try {
+                if (!this.userStore.user || !this.userStore.user.id) {
+                    this.error = "User not authenticated";
+                    return;
+                }
+                const response = await api.post(`/export-treatments/${this.userStore.user.id}`);
+                alert(response.message);
+            } catch (err) {
+                this.error = err.message || "Failed to send treatment reports";
+                console.error("error:", err);
+            }
+        },
         async fetchTreatments() {
             try {
                 if (!this.userStore.user || !this.userStore.user.id) {
