@@ -14,3 +14,8 @@ backend/.venv
 backend/db_directory/database.sqlite3
 .idea
 .python-version
+*.asc
+*.gpg
+.vscode/
+node_modules/
+backend/celerybeat-schedule
