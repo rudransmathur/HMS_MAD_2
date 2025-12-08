@@ -23,6 +23,8 @@ if exist "requirements.txt" (
     echo requirements.txt not found! Please make sure it exists.
 )
 
+if not exist "C:\Path\To\Your\NewFolder" mkdir "C:\Path\To\Your\NewFolder"
+
 REM Initalise Database
 python -m scripts.seed
 
