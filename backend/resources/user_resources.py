@@ -143,6 +143,8 @@ class UserResource(Resource):
                     PatientService.update_patient(user_id, patient_data)
 
                 refreshed = UserService.get_user(user_id).first()
+                cache.delete_memoized(UserResource.get, UserResource, user_id)
+                cache.delete("user_get")
                 return marshal(refreshed, patient_marshal), 200
 
             elif item.doctor_profile:
@@ -155,11 +157,15 @@ class UserResource(Resource):
                     DoctorService.update_doctor(user_id, doctor_data)
 
                 refreshed = UserService.get_user(user_id).first()
+                cache.delete_memoized(UserResource.get, UserResource, user_id)
+                cache.delete("user_get")
                 return marshal(refreshed, doctor_marshal), 200
 
             else:
                 UserService.update_user(args)
                 refreshed = UserService.get_user(user_id).first()
+                cache.delete_memoized(UserResource.get, UserResource, user_id)
+                cache.delete("user_get")
                 return marshal(refreshed, user_marshal), 200
         cache.delete_memoized(UserResource.get, UserResource, user_id)
         cache.delete("user_get")
@@ -185,6 +191,8 @@ class UserResource(Resource):
                 return {'message': 'Admin can only delete doctor profiles'}, 403
 
             message = UserService.delete_user(user_id)
+            cache.delete_memoized(UserResource.get, UserResource, user_id)
+            cache.delete("user_get")
             return message, 200
 
         if current_user.has_role("Patient"):
@@ -192,6 +200,8 @@ class UserResource(Resource):
                 return {'message': 'Patient can only delete their own profile'}, 403
 
             message = UserService.delete_user(user_id)
+            cache.delete_memoized(UserResource.get, UserResource, user_id)
+            cache.delete("user_get")
             return message, 200
         cache.delete_memoized(UserResource.get, UserResource, user_id)
         cache.delete("user_get")
@@ -225,6 +235,8 @@ class UserResource(Resource):
                     PatientService.update_patient(user_id, patient_data)
 
                 refreshed = UserService.get_user(user_id).first()
+                cache.delete_memoized(UserResource.get, UserResource, user_id)
+                cache.delete("user_get")
                 return marshal(refreshed, patient_marshal), 200
 
             elif item.doctor_profile:
@@ -237,11 +249,15 @@ class UserResource(Resource):
                     DoctorService.update_doctor(user_id, doctor_data)
 
                 refreshed = UserService.get_user(user_id).first()
+                cache.delete_memoized(UserResource.get, UserResource, user_id)
+                cache.delete("user_get")
                 return marshal(refreshed, doctor_marshal), 200
 
             else:
                 UserService.update_user(data)
                 refreshed = UserService.get_user(user_id).first()
+                cache.delete_memoized(UserResource.get, UserResource, user_id)
+                cache.delete("user_get")
                 return marshal(refreshed, user_marshal), 200
 
         cache.delete_memoized(UserResource.get, UserResource, user_id)

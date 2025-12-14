@@ -1,10 +1,13 @@
 from flask import Blueprint, jsonify, request
 from flask_security import verify_password, hash_password
 from datetime import datetime
+from flask_login import login_user, login_required
 
 from flask import current_app
 from application import User, Patient, Doctor, DoctorAvailability, db
 from flask_login import login_user
+from application import cache
+from services import RequestService
 
 auth_bp = Blueprint("auth", __name__, url_prefix='/api/auth')
 
@@ -26,7 +29,7 @@ def login():
     if not user.active:
         return jsonify({"message":"User is flagged"})
 
-    login_user(user)
+    login_user(user, remember=True)
 
     user_role = user.roles[0].name if user.roles else None
 
@@ -121,12 +124,24 @@ def register():
                                             start_time = start_time, end_time = end_time)
                 db.session.add(item_d)
                 db.session.commit()
+            
+            req = {"data": data, "status": "created", "type": "put", "user_id": user.user_id}
+            RequestService.create_request(req)
+            
+            cache.delete("user_get")
+
+            role_obj = datastore.find_role(role)
+            datastore.add_role_to_user(user, role_obj)
+            db.session.commit()
+            
+            return {"message":f"request created, wait for admin approval"}, 200
 
         role_obj = datastore.find_role(role)
         datastore.add_role_to_user(user, role_obj)
 
         db.session.commit()
 
+        cache.delete("user_get")
         return jsonify({"id": user.user_id,
                         "username": user.username,
                         "fullname": user.fullname,

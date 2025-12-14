@@ -7,7 +7,7 @@ echo "You can rerun this without any issues."
 echo "----------------------------------------------------------------------"
 
 # Check if .venv folder exists
-if [ -d ".venv" ]; then
+if [ -d "linux.venv" ]; then
     echo "Enabling virtual environment..."
 else
     echo "No virtual environment found. Please run setup_env.sh first."
@@ -15,7 +15,7 @@ else
 fi
 
 # Activate virtual environment
-source .venv/bin/activate
+source linux.venv/bin/activate
 
 # Set environment variable
 export ENV=development
