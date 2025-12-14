@@ -24,6 +24,8 @@ else
     echo "requirements.txt not found! Please make sure it exists."
 fi
 
+mkdir -p /path/to/your/directory
+
 # Initialise Database
 python3 -m scripts.seed
 
