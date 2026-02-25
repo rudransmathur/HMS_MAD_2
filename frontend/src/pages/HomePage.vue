@@ -3,20 +3,39 @@
         <!-- Hero -->
         <section class="py-5 text-white" style="background: linear-gradient(135deg,#007bff 0%,#6610f2 100%);">
             <div class="container text-center py-5">
-                <h1 class="display-4 fw-bold">Hospital Management — Simple. Secure. Fast.</h1>
-                <p class="lead mb-4">Book appointments, manage patient records, and coordinate care — all from a single, easy-to-use dashboard designed for clinics and hospitals.</p>
+                <!-- Welcome Section -->
                 <div v-if ="!isAuthenticated">
+                    <h1 class="display-4 fw-bold">Hospital Management — Simple. Secure. Fast.</h1>
+                    <p class="lead mb-4">Book appointments, manage your records, and coordinate care — all from a single, easy-to-use dashboard designed for clinics and hospitals.</p>
                     <router-link to="/signup" class="btn btn-light btn-lg me-2">Sign up</router-link>
                     <router-link to="/login" class="btn btn-outline-light btn-lg">Sign in</router-link>
                 </div>
+                <div v-if="isAdmin">
+                    <div class="mb-5">
+                        <h1 class="display-6 fw-bold">Welcome Admin</h1>
+                    </div>
+                    <p class="lead mb-4"> Manage Doctor and patients records, Manage appointments and coordinate care quickly</p>
+                    <router-link to="/" class="btn btn-outline-light btn-lg me-2">##</router-link>
+                    <router-link to="/" class="btn btn-outline-light btn-lg">#####</router-link>
+                    <router-link to="/" class="btn btn-outline-light btn-lg ms-2">###</router-link>
+                </div>
                 <div v-if="isPatient">
-                    <router-link to="/patientappointments" class="btn btn-light btn-lg me-2">View Appointments</router-link>
-                    <router-link to="/patienttreatments" class="btn btn-outline-light btn-lg">View Doctor Diagnosis</router-link>
+                    <div class="mb-5">
+                        <h1 class="display-6 fw-bold">Welcome, {{ userStore.user?.fullname || 'Patient' }}!</h1>
+                    </div>
+                    <p class="lead mb-4">Organize appointments, manage patient diagnoses, and schedule your availability for the next week in one place.</p>
+                    <router-link to="/patientappointments" class="btn btn-outline-light btn-lg me-2">View Appointments</router-link>
+                    <router-link to="/patienttreatments" class="btn btn-outline-light btn-lg">View Diagnosis Reports</router-link>
                     <router-link to="/patientsearch" class="btn btn-outline-light btn-lg ms-2">Search Doctors</router-link>
                 </div>
                 <div v-if="isDoctor">
-                    <router-link to="/doctorappointments" class="btn btn-light btn-lg me-2">View Appointments</router-link>
-                    <router-link to="/doctortreatments" class="btn btn-outline-light btn-lg">View Diagnosis</router-link>
+                    <div class="mb-5">
+                        <h1 class="display-6 fw-bold">Welcome, {{ userStore.user?.fullname || 'Doctor' }}!</h1>
+                    </div>
+                    <p class="lead mb-4">Book appointments, view your diagnosis and treatment records, and search for doctors easily.</p>
+                    <router-link to="/doctorappointments" class="btn btn-outline-light btn-lg me-2">Appointments</router-link>
+                    <router-link to="/doctortreatments" class="btn btn-outline-light btn-lg">Diagnosis Reports</router-link>
+                    <router-link to="/doctoravailabilities" class="btn btn-outline-light btn-lg me-2 ms-2">Add/Edit Availabilities</router-link>
                 </div>
             </div>
         </section>
@@ -101,18 +120,8 @@
                             </ul>
                             <div class="mt-3">
                                 <router-link to="/signup" class="btn btn-primary me-2">Sign up</router-link>
-                                <router-link to="/appointments" class="btn btn-outline-primary">See appointments</router-link>
+                                <router-link to="/appointments" class="btn btn-outline-primary">Sed scheduling conflicts, and track patient history. This Hospital Management System aims to provide a centralized, secure, and user-friendly solution to reduce administrative overhead and improve patient care.</router-link>
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Project purpose / rationale -->
-                <div class="row mt-4">
-                    <div class="col-12">
-                        <div class="p-4 border rounded bg-light">
-                            <h5 class="fw-semibold">Why this project?</h5>
-                            <p>Hospitals need efficient systems to manage patients, doctors, appointments, and treatments. Currently, many hospitals use manual registers or disconnected software, which makes it difficult to manage records, avoid scheduling conflicts, and track patient history. This Hospital Management System aims to provide a centralized, secure, and user-friendly solution to reduce administrative overhead and improve patient care.</p>
                         </div>
                     </div>
                 </div>
