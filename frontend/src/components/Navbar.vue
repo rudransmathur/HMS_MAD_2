@@ -28,6 +28,11 @@
                 Diagnosis Reports
               </router-link>
             </li>
+            <li class="nav-item text-center mx-2 mx-lg-1">
+              <router-link class="nav-link" to="/doctoravailabilities">
+                Add/Edit Availabilities
+              </router-link>
+            </li>
           </ul>
 
           <!-- Patient -->

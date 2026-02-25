@@ -163,23 +163,23 @@ def seed(app):
         safe_commit()
         print(f"Created {len(doctor_users)} doctor users.")
 
-        # Create doctor availabilities (2-4 slots per doctor)
-        print("Seeding doctor availabilities...")
-        for doc_user in doctor_users:
-            # each doctor: 3 random days with morning/afternoon times
-            days = random.sample(range(0, 7), k=3)
-            for d in days:
-                start = random_time_between(9, 15)
-                end = (datetime.datetime.combine(datetime.date.today(), start) + datetime.timedelta(hours=2)).time()
-                availability = DoctorAvailability(
-                    doctor_id=doc_user.user_id,
-                    day_of_week=d,
-                    start_time=start,
-                    end_time=end
-                )
-                db.session.add(availability)
-        safe_commit()
-        print("Doctor availabilities created.")
+        # # Create doctor availabilities (2-4 slots per doctor)
+        # print("Seeding doctor availabilities...")
+        # for doc_user in doctor_users:
+        #     # each doctor: 3 random days with morning/afternoon times
+        #     days = random.sample(range(0, 7), k=3)
+        #     for d in days:
+        #         start = random_time_between(9, 15)
+        #         end = (datetime.datetime.combine(datetime.date.today(), start) + datetime.timedelta(hours=2)).time()
+        #         availability = DoctorAvailability(
+        #             doctor_id=doc_user.user_id,
+        #             day_of_week=d,
+        #             start_time=start,
+        #             end_time=end
+        #         )
+        #         db.session.add(availability)
+        # safe_commit()
+        # print("Doctor availabilities created.")
 
         # Create patients
         NUM_PATIENTS = 50

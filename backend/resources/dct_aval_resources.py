@@ -1,18 +1,18 @@
 from flask import request
 from flask import Blueprint, jsonify, request
 from flask_restful import Resource, marshal, fields, reqparse
+from datetime import datetime
 
 from .marshal_fields import availability_marshal
 from services import DoctorAvailabilityService
 
 
 parser = reqparse.RequestParser()
-parser.add_argument('appointmendav_id', type=int, required=True)
-parser.add_argument('patiendav_id', type=int, required=True)
+parser.add_argument('dav_id', type=int)
 parser.add_argument('doctor_id', type=int, required=True)
-parser.add_argument('diagnosis', type=str, required=True)
-parser.add_argument('prescription', type=str, required=True)
-parser.add_argument('notes', type=str, required=True)
+parser.add_argument('date', type=str, required=True)
+parser.add_argument('start_time', type=str, required=True)
+parser.add_argument('end_time', type=str, required=True)
 
 class DoctorAvailabilityResource(Resource):
     @staticmethod
@@ -26,6 +26,7 @@ class DoctorAvailabilityResource(Resource):
         if not item:
             return {'message': 'Doctor Availability not found'}, 404
         args = parser.parse_args()
+        args['date'] = datetime.strptime(args['date'], "%Y-%m-%d").date()
         args["dav_id"] = dav_id
         DoctorAvailabilityService.update_availability(args)
 
@@ -46,7 +47,7 @@ class DoctorAvailabilityResource(Resource):
         data["dav_id"] = dav_id
         DoctorAvailabilityService.update_availability(data)
 
-class DoctorAvailabilityListResource(Resource):
+class AllAvailabilityListResource(Resource):
     @staticmethod
     def get():
         items = DoctorAvailabilityService.get_all()
@@ -54,5 +55,14 @@ class DoctorAvailabilityListResource(Resource):
     @staticmethod
     def post():
         args = parser.parse_args()
+        args['date'] = datetime.strptime(args['date'], "%Y-%m-%d").date()
+        args['start_time'] = datetime.strptime(args['start_time'], "%H:%M:%S").time()
+        args['end_time'] = datetime.strptime(args['end_time'], "%H:%M:%S").time()
         item = DoctorAvailabilityService.create_availability(args)
         return marshal(item, availability_marshal), 201
+
+class DoctorAvailabilityListResource(Resource):
+    @staticmethod
+    def get(doc_id):
+        items = DoctorAvailabilityService.get_doctors_availabilities(doc_id)
+        return marshal(items, availability_marshal), 200

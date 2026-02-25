@@ -11,6 +11,7 @@ const router = createRouter({
     {path: '/patientsearch', component: () => import('@/pages/patient/PatientSearch.vue')},
     {path: '/patientprofile', component: () => import('@/pages/patient/PatientProfile.vue')},
     {path: '/doctorappointments', component: () => import('@/pages/doctor/DoctorDashboard.vue')},
+    {path: '/doctoravailabilities', component: () => import('@/pages/doctor/DoctorAvailabilities.vue')},
     {path: '/doctortreatments', component: () => import('@/pages/doctor/DoctorDiagnosis.vue')},
     {path: '/doctorprofile', component: () => import('@/pages/doctor/DoctorProfile.vue')},
     {path: '/admindoctors', component: () => import('@/pages/admin/AdminDashboard.vue')},

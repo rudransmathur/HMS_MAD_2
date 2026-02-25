@@ -65,7 +65,7 @@ class DoctorAvailability(db.Model):
     __tablename__ = 'doctor_availability'
     dav_id = db.Column(db.Integer, primary_key=True)
     doctor_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
-    day_of_week = db.Column(db.Integer, nullable=False)  # 0=Mon ... 6=Sun
+    date = db.Column(db.Date, nullable=False)
     start_time = db.Column(db.Time, nullable=False)
     end_time = db.Column(db.Time, nullable=False)
 

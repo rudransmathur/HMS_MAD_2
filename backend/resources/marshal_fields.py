@@ -70,7 +70,7 @@ doctor_marshal = {
 availability_marshal = {
     "dav_id": fields.Integer,
     "doctor_id": fields.Integer,
-    "day_of_week": fields.Integer,
+    "date": fields.String(attribute="date"),
     "start_time": fields.String(attribute="start_time"),
     "end_time": fields.String(attribute="end_time")
 }

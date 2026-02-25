@@ -5,7 +5,7 @@ from .auth_resources import auth_bp
 from .apt_resources import AppointmentResource, AppointmentListResource, PatientAppointmentsResource, DoctorAppointmentsResource
 from .trt_resource import TreatmentResource, TreatmentListResource, PatientTreatmentResource, DoctorTreatmentResource
 from .user_resources import UserResource, UserListResource, DoctorResource, PatientResource, activate_user, deactivate_user
-from .dct_aval_resources import DoctorAvailabilityResource, DoctorAvailabilityListResource
+from .dct_aval_resources import AllAvailabilityListResource, DoctorAvailabilityListResource, DoctorAvailabilityResource
 from .rqt_resources import RequestResource, RequestListResource
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
@@ -26,8 +26,9 @@ api.add_resource(UserResource, '/user/<int:user_id>')
 api.add_resource(DoctorResource, '/doctors')
 api.add_resource(PatientResource, '/patients')
 
-api.add_resource(DoctorAvailabilityListResource, '/doctoravailability')
-api.add_resource(DoctorAvailabilityResource, '/doctoravailability/<int:doc_id>')
+api.add_resource(AllAvailabilityListResource, '/allavailability')
+api.add_resource(DoctorAvailabilityListResource, '/allavailability/<int:doc_id>')
+api.add_resource(DoctorAvailabilityResource, '/doctoravailability/<int:dav_id>')
 
 api.add_resource(RequestListResource, '/requests')
 api.add_resource(RequestResource, '/requests/<int:r_id>')

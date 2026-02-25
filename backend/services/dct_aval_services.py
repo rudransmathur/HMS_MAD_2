@@ -10,6 +10,11 @@ class DoctorAvailabilityService:
         return DoctorAvailability.query.all()
 
     @staticmethod
+    def get_doctors_availabilities(doc_id):
+        item = DoctorAvailability.query.filter_by(doctor_id=doc_id).all()
+        return item
+
+    @staticmethod
     def get_availability(dav_id):
         item = DoctorAvailability.query.filter_by(dav_id=dav_id)
         if not item:
