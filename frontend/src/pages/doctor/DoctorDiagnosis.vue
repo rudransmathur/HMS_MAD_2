@@ -207,7 +207,6 @@ export default {
                 }
                 
                 const response = await api.get(`/treatment/doctor/${this.userStore.user.id}`);
-                console.log("Fetched treatments:", response);
                 this.treatments = Array.isArray(response) ? response : (response ? [response] : []);
             } catch (err) {
                 this.error = err.message || "Failed to fetch treatments";

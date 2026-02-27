@@ -224,6 +224,7 @@ def seed(app):
         treatments_created = 0
         # For each patient, schedule 0-3 appointments with random doctors
         appointment_date_base = datetime.date.today()
+        used_slots = set()  # (doctor_id, appointment_date, appointment_time)
         for p_user in patient_users:
             num_ap = random.randint(0, 3)
             # get patient id
@@ -232,19 +233,33 @@ def seed(app):
                 continue
             chosen_doctors = random.sample(doctor_users, k=min(len(doctor_users), max(1, num_ap)))
             # schedule appointments on random days upcoming/past within +/-30 days
-            for j in range(num_ap):
-                doc_user = chosen_doctors[j % len(chosen_doctors)]
-                # appointment date
-                delta_days = random.randint(-30, 30)
+            attempts = 0
+            created_for_patient = 0
+            max_attempts = num_ap * 5  # avoid infinite loop
+            while created_for_patient < num_ap and attempts < max_attempts:
+                doc_user = chosen_doctors[created_for_patient % len(chosen_doctors)]
+                delta_days = random.randint(-5, 5)
                 ap_date = appointment_date_base + datetime.timedelta(days=delta_days)
                 ap_time = random_time_between(9, 16)
-                # create appointment if unique constraint not violated
+                slot_key = (doc_user.user_id, ap_date, ap_time)
+                if slot_key in used_slots:
+                    attempts += 1
+                    continue
+
+                today = datetime.date.today()
+                if ap_date > today:
+                    ap_status = "Pending"
+                elif ap_date < today:
+                    ap_status = random.choice(["Completed", "Cancelled"])
+                else:
+                    ap_status = random.choice(["Pending", "Completed", "Cancelled"])
+
                 ap = Appointment(
                     patient_id=patient_obj.patient_id,
                     doctor_id=doc_user.user_id,
                     appointment_date=ap_date,
                     appointment_time=ap_time,
-                    status=random.choice(["Pending", "Confirmed", "Completed", "Cancelled"]),
+                    status=ap_status,
                     reason=fake.sentence(nb_words=8),
                 )
                 db.session.add(ap)
@@ -252,12 +267,13 @@ def seed(app):
                     db.session.flush()
                 except IntegrityError:
                     db.session.rollback()
-                    # skip conflicting slot
+                    attempts += 1
                     continue
+                used_slots.add(slot_key)
                 appointments_created += 1
+                created_for_patient += 1
 
-                # For some appointments, create treatments (if appointment in past or completed)
-                if ap.status in ("Completed",) or ap_date < datetime.date.today() and random.random() < 0.6:
+                if ap.status in ("Completed",) or (ap_date < today and random.random() < 0.6):
                     treat = Treatment(
                         appointment_id=ap.ap_id,
                         patient_id=patient_obj.patient_id,

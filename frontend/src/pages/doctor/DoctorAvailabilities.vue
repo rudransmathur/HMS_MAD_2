@@ -229,6 +229,7 @@
                     console.error('error:', err);
                 }
             },
+            
             async fetchAvailabilities() {
                 try {
                     this.isLoading = true;
@@ -255,6 +256,7 @@
                     this.isLoading = false;
                 }
             },
+
             organizeByWeek() {
                 const week = [];
                 const today = new Date();
@@ -280,6 +282,7 @@
                 
                 this.upcomingWeek = week;
             },
+
             validateForm() {
                 this.formErrors = [];
                 
@@ -330,6 +333,7 @@
                 }
                 return this.formErrors.length === 0;
             },
+
             async submitForm() {
                 if (!this.validateForm()) {
                     return;
