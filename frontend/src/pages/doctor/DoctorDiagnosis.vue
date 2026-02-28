@@ -25,16 +25,39 @@
             {{ successMessage }}
             <button type="button" class="btn-close" @click="successMessage = ''"></button>
         </div>
-
+        
+        <!-- Search/Filter Section -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label mb-1">Patient Name</label>
+                        <input v-model="search.patient" type="text" class="form-control" placeholder="Search by patient name">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label mb-1">Date</label>
+                        <input v-model="search.date" type="date" class="form-control">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label mb-1">Time</label>
+                        <input v-model="search.time" type="time" class="form-control">
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-outline-secondary w-100" @click="clearSearch" type="button">Clear</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- No Treatments Message -->
-        <div v-if="treatments.length === 0" class="alert alert-info text-center py-5">
+        <div v-if="filteredTreatments.length === 0" class="alert alert-info text-center py-5">
             <i class="bi bi-file-earmark-medical" style="font-size: 3rem; color: #0d6efd;"></i>
-            <p class="mt-3 mb-0">No treatment reports created yet. Click "New Treatment" to create one.</p>
+            <p class="mt-3 mb-0">No treatment reports found for the selected criteria.</p>
         </div>
 
         <!-- Treatments List -->
         <div v-else>
-            <div v-for="(treatment, index) in treatments" :key="treatment.t_id || index" class="card shadow-sm mb-4 border-0">
+            <div v-for="(treatment, index) in filteredTreatments" :key="treatment.t_id || index" class="card shadow-sm mb-4 border-0">
                 <div class="card-header bg-light border-bottom d-flex justify-content-between align-items-center">
                     <div>
                         <h5 class="mb-1">
@@ -183,6 +206,11 @@ export default {
             showModal: false,
             isediting: false,
             isSaving: false,
+            search: {
+                patient: '',
+                date: '',
+                time: ''
+            },
             formData: {
                 t_id: null,
                 patient_id: '',
@@ -193,12 +221,56 @@ export default {
             }
         };
     },
+        computed: {
+            filteredTreatments() {
+                return this.treatments.filter(treatment => {
+                    // Patient name filter
+                    const patientMatch = this.search.patient.trim() === '' || (treatment.patient_name && treatment.patient_name.toLowerCase().includes(this.search.patient.trim().toLowerCase()));
+
+                    // Date filter (compare only date part)
+                    let dateMatch = true;
+                    if (this.search.date) {
+                        // treatment.created_date may be ISO string or similar
+                        const tDate = treatment.created_date ? new Date(treatment.created_date) : null;
+                        const searchDate = new Date(this.search.date);
+                        if (tDate) {
+                            dateMatch = tDate.getFullYear() === searchDate.getFullYear() &&
+                                tDate.getMonth() === searchDate.getMonth() &&
+                                tDate.getDate() === searchDate.getDate();
+                        } else {
+                            dateMatch = false;
+                        }
+                    }
+
+                    // Time filter (compare hour:minute)
+                    let timeMatch = true;
+                    if (this.search.time) {
+                        const tDate = treatment.created_date ? new Date(treatment.created_date) : null;
+                        if (tDate) {
+                            const tHours = String(tDate.getHours()).padStart(2, '0');
+                            const tMinutes = String(tDate.getMinutes()).padStart(2, '0');
+                            const searchParts = this.search.time.split(':');
+                            timeMatch = tHours === searchParts[0] && tMinutes === searchParts[1];
+                        } else {
+                            timeMatch = false;
+                        }
+                    }
+
+                    return patientMatch && dateMatch && timeMatch;
+                });
+            }
+    },
     created(){
         this.userStore = useUserStore();
         this.fetchTreatments();
         this.fetchAvailablePatients();
     },
     methods: {
+        clearSearch() {
+            this.search.patient = '';
+            this.search.date = '';
+            this.search.time = '';
+        },
         async fetchTreatments() {
             try {
                 if (!this.userStore.user || !this.userStore.user.id) {
@@ -213,6 +285,7 @@ export default {
                 console.error("Fetch treatments error:", err);
             }
         },
+
         async fetchAvailablePatients() {
             try {
                 if (!this.userStore.user || !this.userStore.user.id) {
@@ -238,6 +311,7 @@ export default {
                 console.error("Failed to fetch available patients:", err);
             }
         },
+
         editTreatment(treatment) {
             this.isediting = true;
             this.formData = {
@@ -251,6 +325,7 @@ export default {
             this.error = "";
             this.showModal = true;
         },
+
         closeModal() {
             this.showModal = false;
             this.isediting = false;
@@ -264,6 +339,7 @@ export default {
             };
             this.error = "";
         },
+        
         async saveform() {
             try {
                 if (!this.formData.diagnosis || !this.formData.prescription) {
@@ -302,6 +378,7 @@ export default {
                 this.isSaving = false;
             }
         },
+
         async confirmDelete(treatment) {
             if (!window.confirm("Are you sure you want to delete this Treatment?")) {
                 return;
@@ -315,6 +392,7 @@ export default {
                 console.error("error:", err);
             }
         },
+
         formatDate(dateStr) {
             if (!dateStr) return "—";
             try {
