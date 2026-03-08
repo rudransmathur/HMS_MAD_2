@@ -14,11 +14,11 @@
         <!-- Appointments -->
         <div class="card shadow-lg mb-5">
             <div class="card-header bg-primary text-white">
-                <h3 class="mb-0"><i class="bi bi-calendar-check"></i> Your Appointments</h3>
+                <h3 class="mb-0"><i class="bi bi-calendar-check"></i> Today's Appointments</h3>
             </div>
             <div class="card-body">
                 <!-- No Appointments  -->
-                <div v-if="appointments.length === 0" class="text-center py-5">
+                <div v-if="presentAppointments.length === 0" class="text-center py-5">
                     <i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
                     <p class="text-muted mt-3">You haven't booked any appointments yet.</p>
                     <p class="text-muted">Click the "Book Appointment" button below to get started.</p>
@@ -39,7 +39,111 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="appointment in appointments" :key="appointment.ap_id">
+                                <tr v-for="appointment in presentAppointments" :key="appointment.ap_id">
+                                    <td class="fw-semibold">{{ getDoctorName(appointment.doctor_id) }}</td>
+                                    <td>{{ formatDate(appointment.appointment_date) }}</td>
+                                    <td>{{ appointment.appointment_time }}</td>
+                                    <td>
+                                        <span :class="getStatusBadge(appointment.status)">
+                                            {{ appointment.status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ appointment.reason || "—" }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-warning me-2" @click="editAppointment(appointment)" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" @click="deleteAppointment(appointment.ap_id)" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card shadow-lg mb-5">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0"><i class="bi bi-calendar-check"></i> Future Appointments</h3>
+            </div>
+            <div class="card-body">
+                <!-- No Appointments  -->
+                <div v-if="futureAppointments.length === 0" class="text-center py-5">
+                    <i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
+                    <p class="text-muted mt-3">You haven't booked any appointments yet.</p>
+                    <p class="text-muted">Click the "Book Appointment" button below to get started.</p>
+                </div>
+
+                <!-- Appointments List -->
+                <div v-else>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th><i class="bi bi-person-fill"></i> Doctor</th>
+                                    <th><i class="bi bi-calendar"></i> Date</th>
+                                    <th><i class="bi bi-clock"></i> Time</th>
+                                    <th><i class="bi bi-info-circle"></i> Status</th>
+                                    <th><i class="bi bi-chat"></i> Reason</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="appointment in futureAppointments" :key="appointment.ap_id">
+                                    <td class="fw-semibold">{{ getDoctorName(appointment.doctor_id) }}</td>
+                                    <td>{{ formatDate(appointment.appointment_date) }}</td>
+                                    <td>{{ appointment.appointment_time }}</td>
+                                    <td>
+                                        <span :class="getStatusBadge(appointment.status)">
+                                            {{ appointment.status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ appointment.reason || "—" }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-warning me-2" @click="editAppointment(appointment)" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" @click="deleteAppointment(appointment.ap_id)" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card shadow-lg mb-5">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0"><i class="bi bi-calendar-check"></i> Past Appointments</h3>
+            </div>
+            <div class="card-body">
+                <!-- No Appointments  -->
+                <div v-if="pastAppointments.length === 0" class="text-center py-5">
+                    <i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
+                    <p class="text-muted mt-3">You haven't booked any appointments yet.</p>
+                    <p class="text-muted">Click the "Book Appointment" button below to get started.</p>
+                </div>
+
+                <!-- Appointments List -->
+                <div v-else>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th><i class="bi bi-person-fill"></i> Doctor</th>
+                                    <th><i class="bi bi-calendar"></i> Date</th>
+                                    <th><i class="bi bi-clock"></i> Time</th>
+                                    <th><i class="bi bi-info-circle"></i> Status</th>
+                                    <th><i class="bi bi-chat"></i> Reason</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="appointment in pastAppointments" :key="appointment.ap_id">
                                     <td class="fw-semibold">{{ getDoctorName(appointment.doctor_id) }}</td>
                                     <td>{{ formatDate(appointment.appointment_date) }}</td>
                                     <td>{{ appointment.appointment_time }}</td>
@@ -85,7 +189,7 @@
                             <!-- Doctor Selection -->
                             <div class="mb-3">
                                 <label for="doctor" class="form-label fw-semibold">Select Doctor <span class="text-danger">*</span></label>
-                                <select v-model="formData.doctor_id" id="doctor" class="form-select" required>
+                                <select v-model="formData.doctor_id" id="doctor" class="form-select" required @change="getavailability(formData.doctor_id)">
                                     <option value="">-- Choose a Doctor --</option>
                                     <option v-for="doctor in doctors" :key="doctor.user_id" :value="doctor.user_id">
                                         Dr. {{ doctor.fullname }} - {{ doctor.specialization }}
@@ -96,19 +200,29 @@
                             <!-- Appointment Date -->
                             <div class="mb-3">
                                 <label for="date" class="form-label fw-semibold">Appointment Date <span class="text-danger">*</span></label>
-                                <input v-model="formData.appointment_date" type="date" id="date" class="form-control" required>
+                                <select v-model="formData.appointment_date" id="date" class="form-select" required>
+                                    <option value="">-- Select Date --</option>
+                                    <option v-for="slot in allAvailabilities" :key="slot.date" :value="slot.date">
+                                        {{ slot.date }}
+                                    </option>
+                                </select>
                             </div>
 
                             <!-- Appointment Time -->
                             <div class="mb-3">
                                 <label for="time" class="form-label fw-semibold">Appointment Time <span class="text-danger">*</span></label>
-                                <input v-model="formData.appointment_time" type="time" id="time" class="form-control" required>
+                                <select v-model="formData.appointment_time" id="time" class="form-select" required>
+                                    <option value="">-- Select Time --</option>
+                                    <option v-for="time in availabilities" :key="time" :value="time">{{ time }}</option>
+                                </select>
                             </div>
-
                             <!-- Reason -->
                             <div class="mb-3">
                                 <label for="reason" class="form-label fw-semibold">Reason for Visit <span class="text-danger">*</span></label>
                                 <textarea v-model="formData.reason" id="reason" class="form-control" rows="3" placeholder="Describe your symptoms or reason" required></textarea>
+                            </div>
+                            <div v-if="modalError" class="mt-2 alert alert-danger alert-dismissible fade show" role="alert">
+                                {{ modalError }}
                             </div>
 
                             <!-- Form Actions -->
@@ -137,8 +251,15 @@ export default {
     data() {
         return {
             error: "",
+            modalError: "",
             appointments: [],
+            presentAppointments: [],
+            pastAppointments: [],
+            futureAppointments: [],
+            doctor_apt: [],
             doctors: [],
+            availabilities: [],
+            allAvailabilities: [],
             userStore: null,
             showModal: false,
             editingAppointment: null,
@@ -157,6 +278,18 @@ export default {
         this.fetchAppointments();
         this.fetchDoctors();
     },
+    watch: {
+        'formData.appointment_date': function() {
+            this.filterAvailabilitiesByDate();
+        },
+        'formData.doctor_id': function() {
+            // When doctor changes, clear date and time, and reset availabilities
+            this.formData.appointment_date = "";
+            this.formData.appointment_time = "";
+            this.availabilities = [];
+            this.allAvailabilities = [];
+        }
+    },
     methods: {
         async fetchAppointments() {
             try {
@@ -172,7 +305,35 @@ export default {
                 this.error = err.message || "Failed to fetch appointments";
                 console.error("error:", err);
             }
+            finally{
+                console.log("Appointments:", this.appointments);
+                await this.sortAppointents();
+            }
         },
+
+        async sortAppointents(){
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            const todayStr = `${year}-${month}-${day}`;
+            this.presentAppointments = this.appointments.filter(apt => {
+                const aptDate = new Date(apt.appointment_date);
+                const aptDateStr = `${aptDate.getFullYear()}-${String(aptDate.getMonth() + 1).padStart(2, '0')}-${String(aptDate.getDate()).padStart(2, '0')}`;
+                return aptDateStr === todayStr;
+            });
+            this.pastAppointments = this.appointments.filter(apt => {
+                const aptDate = new Date(apt.appointment_date);
+                const aptDateStr = `${aptDate.getFullYear()}-${String(aptDate.getMonth() + 1).padStart(2, '0')}-${String(aptDate.getDate()).padStart(2, '0')}`;
+                return aptDateStr < todayStr;
+            });
+            this.futureAppointments = this.appointments.filter(apt => {
+                const aptDate = new Date(apt.appointment_date);
+                const aptDateStr = `${aptDate.getFullYear()}-${String(aptDate.getMonth() + 1).padStart(2, '0')}-${String(aptDate.getDate()).padStart(2, '0')}`;
+                return aptDateStr > todayStr;
+            });
+        },
+
         async fetchDoctors() {
             try {
                 const response = await api.get('/doctors');
@@ -184,15 +345,97 @@ export default {
                 console.error("Failed to fetch doctors:", err);
             }
         },
+
+        async getavailability(doctorId) {
+            try {
+                const res = await api.get(`/allavailability/${doctorId}`);
+                const total_availabilities = (Array.isArray(res) ? res : [res]);
+                this.allAvailabilities = total_availabilities;
+            } catch (err) {
+                this.modalError = err.message || "Failed to fetch availability";
+                console.error("Failed to fetch availability:", err);
+                this.allAvailabilities = [];
+            }
+            try {
+                const doctor_apt_res = await api.get(`/appointments/doctor/${doctorId}`);
+                this.doctor_apt = (Array.isArray(doctor_apt_res) ? doctor_apt_res : [doctor_apt_res]);
+            } catch (error) {
+                this.modalError = error.message || "Failed to fetch doctor's appointments";
+                console.error("Failed to fetch doctor's appointments:", error);
+                this.doctor_apt = [];
+            }
+            this.filterAvailabilitiesByDate();
+        },
+
+        filterAvailabilitiesByDate() {
+            if (!this.allAvailabilities || !this.formData.appointment_date) {
+                this.availabilities = [];
+                return;
+            }
+            // Find all slots for the selected date
+            const slotsForDate = this.allAvailabilities.filter(
+                slot => slot.date === this.formData.appointment_date
+            );
+            // Get all booked times for this doctor on this date
+            const bookedTimes = this.doctor_apt
+                .filter(apt => apt.appointment_date === this.formData.appointment_date)
+                .map(apt => apt.appointment_time);
+
+            // For each slot, generate all possible times in the slot's range (30 min interval)
+            let availableTimes = [];
+            slotsForDate.forEach(slot => {
+                let start = slot.start_time;
+                let end = slot.end_time;
+                let current = start;
+                while (current < end) {
+                    if (!bookedTimes.includes(current)) {
+                        availableTimes.push(current);
+                    }
+                    // Increment by 30 minutes
+                    let [h, m, s] = current.split(':').map(Number);
+                    m += 30;
+                    if (m >= 60) {
+                        h += 1;
+                        m -= 60;
+                    }
+                    current = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:00`;
+                    if (current > end) break;
+                }
+            });
+            this.availabilities = availableTimes;
+        },
+        // ...existing code...
+        getSlotTimes(slot) {
+            console.log(slot);
+            let times = [];
+            let start = slot.start_time;
+            let end = slot.end_time;
+            let current = start;
+            while (current < end) {
+                times.push(current);
+                let [h, m, s] = current.split(':').map(Number);
+                m += 30;
+                if (m >= 60) {
+                    h += 1;
+                    m -= 60;
+                }
+                current = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:00`;
+                if (current > end) break;
+            }
+            return times;
+        },
+
         getDoctorName(doctorId) {
             const doctor = this.doctors.find(d => d.user_id === doctorId);
             return doctor ? `Dr. ${doctor.fullname}` : "Unknown Doctor";
         },
+
         formatDate(dateStr) {
             if (!dateStr) return "—";
             const date = new Date(dateStr);
             return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
         },
+
         getStatusBadge(status) {
             const badges = {
                 'Pending': 'badge bg-warning text-dark',
@@ -202,6 +445,7 @@ export default {
             };
             return badges[status] || 'badge bg-secondary';
         },
+
         editAppointment(appointment) {
             this.editingAppointment = appointment;
             this.formData = {
@@ -213,6 +457,7 @@ export default {
             };
             this.showModal = true;
         },
+
         closeModal() {
             this.showModal = false;
             this.editingAppointment = null;
@@ -224,6 +469,7 @@ export default {
                 status: "Pending"
             };
         },
+
         async submitAppointment() {
             try {
                 this.isSubmitting = true;
@@ -253,6 +499,7 @@ export default {
                 this.isSubmitting = false;
             }
         },
+
         async deleteAppointment(apId) {
             if (!window.confirm("Are you sure you want to delete this appointment?")) {
                 return;

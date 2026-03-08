@@ -18,6 +18,8 @@ class DoctorAvailabilityResource(Resource):
     @staticmethod
     def get(dav_id):
         item = DoctorAvailabilityService.get_availability(dav_id).first()
+        if not item:
+            return {'message': 'Doctor Availability not found'}, 404
         return marshal(item, availability_marshal), 200
 
     @staticmethod
@@ -51,6 +53,8 @@ class AllAvailabilityListResource(Resource):
     @staticmethod
     def get():
         items = DoctorAvailabilityService.get_all()
+        if not items:
+            return {'message': 'No availabilities found'}, 404
         return marshal(items, availability_marshal), 200
     @staticmethod
     def post():
@@ -65,4 +69,6 @@ class DoctorAvailabilityListResource(Resource):
     @staticmethod
     def get(doc_id):
         items = DoctorAvailabilityService.get_doctors_availabilities(doc_id)
+        if not items:
+            return {'message': 'No availabilities found'}, 404
         return marshal(items, availability_marshal), 200

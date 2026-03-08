@@ -247,13 +247,12 @@
 
                     const resp = await api.get(`/allavailability/${this.userStore.user.id}`);
                     this.availabilities = Array.isArray(resp) ? resp : (resp ? [resp] : []);
-                    this.organizeByWeek();
-
                 } catch (err) {
-                    this.error = err.message;
+                    this.successMessage = err.message;
                     console.error('error:', err);
                 } finally {
                     this.isLoading = false;
+                    this.organizeByWeek();
                 }
             },
 
@@ -265,7 +264,6 @@
                     const date = new Date(today);
                     date.setDate(date.getDate() + i);
                     const dateStr = this.formatDateForAPI(date);
-                    // Filter availabilities for this date and sort by start_time
                     const formattedDate = date.getFullYear() + '-' + 
                         String(date.getMonth() + 1).padStart(2, '0') + '-' +
                         String(date.getDate()).padStart(2, '0');// 0 (Sun) - 6 (Sat)
@@ -279,7 +277,6 @@
                         availabilities: dayAvailabilities,
                     });
                 }
-                
                 this.upcomingWeek = week;
             },
 

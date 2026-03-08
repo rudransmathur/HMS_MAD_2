@@ -22,6 +22,8 @@ class AppointmentResource(Resource):
     @cache.memoize()
     def get(ap_id):
         item = AppointmentService.get_appointment(ap_id).first()
+        if not item:
+            return {'message': 'Appointment not found'}, 404
         return marshal(item, appointment_marshal), 200
 
     @staticmethod
@@ -61,6 +63,8 @@ class AppointmentListResource(Resource):
     @cache.cached(key_prefix="apt_get")
     def get(self):
         items = AppointmentService.get_all()
+        if not items:
+            return {'message': 'No appointments found'}, 404
         return marshal(items, appointment_marshal), 200
 
     def post(self):
@@ -84,5 +88,8 @@ class PatientAppointmentsResource(Resource):
 class DoctorAppointmentsResource(Resource):
     @staticmethod
     def get(doctor_id):
-        items = AppointmentService.get_appointments_by_doctor(doctor_id)
-        return marshal(items, appointment_marshal), 200
+        try:
+            items = AppointmentService.get_appointments_by_doctor(doctor_id)
+            return marshal(items, appointment_marshal), 200
+        except ServiceError as e:
+            return {"message": e.message}, 404
