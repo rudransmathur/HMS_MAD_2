@@ -98,7 +98,6 @@
                                 <td>{{ r.fullname }}</td>
                                 <td class="text-end">
                                     <button class="btn btn-sm btn-outline-primary me-2" @click="processedviewRequest(r)">View</button>
-                                    <button class="btn btn-sm btn-outline-primary me-2" @click="undoRequest(r)">Undo</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -227,24 +226,6 @@ export default {
                 await api.patch(`/requests/${r.r_id}`, payload);
                 await this.fetchRequests();
                 this.pendingselected = null;
-            } catch (e) {
-                this.error = e.message;
-                console.error("error:", e);
-            }
-        },
-        async undoRequest(r){
-            try {
-                const payload = {
-                    r_id: r.r_id,
-                    data: r.data,
-                    status: 'created',
-                    type: r.type,
-                    user_id: r.user_id
-                };
-                // fix: correct URL must not contain a space
-                await api.patch(`/requests/${r.r_id}`, payload);
-                await this.fetchRequests();
-                this.processedselected = null;
             } catch (e) {
                 this.error = e.message;
                 console.error("error:", e);

@@ -228,7 +228,12 @@ export default {
 					fullname: this.editForm.fullname,
 					phone: this.editForm.phone,
 					email: this.editForm.email,
-					active: this.editForm.active
+					active: this.editForm.active,
+					department_name: this.editForm.department_name,
+					qualification: this.editForm.qualification,
+					experience_years: this.editForm.experience_years,
+					specialization: this.editForm.specialization,
+					consultation_fee: this.editForm.fee
 				};
 				if (!this.isDoctor(this.editForm) && this.editForm.active) {
 					await api.patch(`/user/${id}/activate`, payload);

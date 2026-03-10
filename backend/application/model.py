@@ -4,8 +4,8 @@ import datetime
 
 roles_users = db.Table(
     'roles_users',
-    db.Column('user_id', db.Integer(), db.ForeignKey('user.user_id')),
-    db.Column('role_id', db.Integer(), db.ForeignKey('role.role_id'))
+    db.Column('user_id', db.Integer(), db.ForeignKey('user.user_id', ondelete='CASCADE', onupdate='CASCADE')),
+    db.Column('role_id', db.Integer(), db.ForeignKey('role.role_id', ondelete='CASCADE'))
 )
 
 class Role(db.Model, RoleMixin):
@@ -32,7 +32,7 @@ class User(db.Model, UserMixin):
 
 class Patient(db.Model):
     __tablename__ = 'patient'
-    patient_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), primary_key=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey('user.user_id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True)
     dob = db.Column(db.Date)
     gender = db.Column(db.String(10))
     blood_group = db.Column(db.String(15))
@@ -51,7 +51,7 @@ class Patient(db.Model):
 
 class Doctor(db.Model):
     __tablename__ = 'doctor'
-    doctor_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), primary_key=True)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('user.user_id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True)
     department_name = db.Column(db.String, nullable=False)
     qualification = db.Column(db.String(200)) # MBBS MD DO DDS etc
     experience_years = db.Column(db.Integer)
@@ -64,7 +64,7 @@ class Doctor(db.Model):
 class DoctorAvailability(db.Model):
     __tablename__ = 'doctor_availability'
     dav_id = db.Column(db.Integer, primary_key=True)
-    doctor_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('user.user_id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
     date = db.Column(db.Date, nullable=False)
     start_time = db.Column(db.Time, nullable=False)
     end_time = db.Column(db.Time, nullable=False)
@@ -78,7 +78,7 @@ class Request(db.Model):
     status = db.Column(db.Enum("approved", "rejected", "created"))
     type = db.Column(db.String(20))
 
-    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id', ondelete='CASCADE', onupdate='CASCADE'))
 
     user = db.relationship('User', backref=db.backref('requests', lazy=True))
 
@@ -86,8 +86,8 @@ class Request(db.Model):
 class Appointment(db.Model):
     __tablename__ = 'appointment'
     ap_id = db.Column(db.Integer, primary_key=True)
-    patient_id = db.Column(db.Integer, db.ForeignKey('patient.patient_id'), nullable=False)
-    doctor_id = db.Column(db.Integer, db.ForeignKey('doctor.doctor_id'), nullable=False)
+    patient_id = db.Column(db.Integer, db.ForeignKey('patient.patient_id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctor.doctor_id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
     appointment_date = db.Column(db.Date, nullable=False)
     appointment_time = db.Column(db.Time, nullable=False)
     status = db.Column(db.String(20), default='Pending')
@@ -107,9 +107,9 @@ class Appointment(db.Model):
 class Treatment(db.Model):
     __tablename__ = 'treatment'
     t_id = db.Column(db.Integer, primary_key=True)
-    appointment_id = db.Column(db.Integer, db.ForeignKey('appointment.ap_id'))
-    patient_id = db.Column(db.Integer, db.ForeignKey('patient.patient_id'))
-    doctor_id = db.Column(db.Integer, db.ForeignKey('doctor.doctor_id'))
+    appointment_id = db.Column(db.Integer, db.ForeignKey('appointment.ap_id', ondelete='CASCADE', onupdate='CASCADE'))
+    patient_id = db.Column(db.Integer, db.ForeignKey('patient.patient_id', ondelete='CASCADE', onupdate='CASCADE'))
+    doctor_id = db.Column(db.Integer, db.ForeignKey('doctor.doctor_id', ondelete='CASCADE', onupdate='CASCADE'))
     diagnosis = db.Column(db.Text)
     prescription = db.Column(db.Text)
     notes = db.Column(db.Text)
@@ -122,7 +122,7 @@ class Treatment(db.Model):
 class UserSession(db.Model):
     __tablename__ = 'user_session'
     session_id = db.Column(db.String(255), primary_key=True)  # Store session or token
-    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id', ondelete='CASCADE', onupdate='CASCADE'))
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     last_active = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     session_data = db.Column(db.Text)  # For storing serialized info (JSON or similar)
@@ -132,7 +132,7 @@ class UserSession(db.Model):
 class SystemLog(db.Model):
     __tablename__ = 'system_log'
     log_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id', ondelete='CASCADE', onupdate='CASCADE'), nullable=True)
     event_type = db.Column(db.String(32))
     event_desc = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
