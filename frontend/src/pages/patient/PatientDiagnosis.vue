@@ -9,23 +9,44 @@
         <!-- Error Alert -->
         <div v-if="error" class="alert alert-danger alert-dismissible fade show" role="alert">
             {{ error }}
-            <button type="button" class="btn-close" @click="error = ''"></button>
         </div>
 
         <div>
             <button class="btn btn-outline-primary mb-4" @click="sendtreatments">Send Treatment Reports to Mail
             </button>
         </div>
+        
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label mb-1">Doctor Name</label>
+                        <input v-model="search.doctor" type="text" class="form-control" placeholder="Search by doctor name">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label mb-1">Date</label>
+                        <input v-model="search.date" type="date" class="form-control">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label mb-1">Time</label>
+                        <input v-model="search.time" type="time" class="form-control">
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-outline-secondary w-100" @click="clearSearch" type="button">Clear</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- No Treatments Message -->
-        <div v-if="treatments.length === 0" class="alert alert-info text-center py-5">
+        <div v-if="!filteredTreatments || filteredTreatments.length === 0" class="alert alert-info text-center py-5">
             <i class="bi bi-file-earmark-medical" style="font-size: 3rem; color: #0d6efd;"></i>
             <p class="mt-3 mb-0">No diagnosis reports available yet.</p>
         </div>
 
         <!-- Treatments List -->
         <div v-else>
-            <div v-for="(treatment, index) in treatments" :key="index" class="card shadow-sm mb-4">
+            <div v-for="(treatment, index) in filteredTreatments || []" :key="index" class="card shadow-sm mb-4">
                 <div class="card-header bg-light border-bottom">
                     <div class="row align-items-center">
                         <div class="col">
@@ -92,8 +113,40 @@ export default {
         return {
             error: "",
             treatments: [],
+            search: {
+                doctor: '',
+                date: '',
+                time: ''
+            },
             userStore: null,
         };
+    },
+    computed: {
+        filteredTreatments() {
+            return this.treatments.filter(treatment => {
+                // Doctor name filter
+                if (this.search.doctor && !treatment.doctor_name.toLowerCase().includes(this.search.doctor.toLowerCase())) {
+                    return false;
+                }
+                // Date filter
+                if (this.search.date) {
+                    // Only compare date part (YYYY-MM-DD)
+                    const treatmentDate = treatment.created_date ? treatment.created_date.slice(0, 10) : '';
+                    if (treatmentDate !== this.search.date) {
+                        return false;
+                    }
+                }
+                // Time filter
+                if (this.search.time) {
+                    // Only compare time part (HH:MM)
+                    const treatmentTime = treatment.created_date ? treatment.created_date.slice(11, 16) : '';
+                    if (treatmentTime !== this.search.time) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+        }
     },
     created(){
         this.userStore = useUserStore();
@@ -127,6 +180,11 @@ export default {
                 this.error = err.message || "Failed to fetch treatments";
                 console.error("error:", err);
             }
+        },
+        clearSearch(){
+            this.search.doctor = "";
+            this.search.date = "";
+            this.search.time = "";
         },
         formatDate(dateStr) {
             if (!dateStr) return "—";

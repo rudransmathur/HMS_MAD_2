@@ -190,7 +190,7 @@
                             <div class="mb-3">
                                 <label for="doctor" class="form-label fw-semibold">Select Doctor <span class="text-danger">*</span></label>
                                 <select v-model="formData.doctor_id" id="doctor" class="form-select" required @change="getavailability(formData.doctor_id)">
-                                    <option value="">-- Choose a Doctor --</option>
+                                    <option value="">-- Choose a Doctor --</option> 
                                     <option v-for="doctor in doctors" :key="doctor.user_id" :value="doctor.user_id">
                                         Dr. {{ doctor.fullname }} - {{ doctor.specialization }}
                                     </option>
@@ -347,6 +347,7 @@ export default {
         },
 
         async getavailability(doctorId) {
+            this.modalError = "";
             try {
                 const res = await api.get(`/allavailability/${doctorId}`);
                 const total_availabilities = (Array.isArray(res) ? res : [res]);
