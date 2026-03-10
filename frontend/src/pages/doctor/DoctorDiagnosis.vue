@@ -221,44 +221,43 @@ export default {
             }
         };
     },
-        computed: {
-            filteredTreatments() {
-                return this.treatments.filter(treatment => {
-                    // Patient name filter
-                    const patientMatch = this.search.patient.trim() === '' || (treatment.patient_name && treatment.patient_name.toLowerCase().includes(this.search.patient.trim().toLowerCase()));
+    computed: {
+        filteredTreatments() {
+            return this.treatments.filter(treatment => {
+                const patientMatch = this.search.patient.trim() === '' || (treatment.patient_name && treatment.patient_name.toLowerCase().includes(this.search.patient.trim().toLowerCase()));
 
-                    // Date filter (compare only date part)
-                    let dateMatch = true;
-                    if (this.search.date) {
-                        // treatment.created_date may be ISO string or similar
-                        const tDate = treatment.created_date ? new Date(treatment.created_date) : null;
-                        const searchDate = new Date(this.search.date);
-                        if (tDate) {
-                            dateMatch = tDate.getFullYear() === searchDate.getFullYear() &&
-                                tDate.getMonth() === searchDate.getMonth() &&
-                                tDate.getDate() === searchDate.getDate();
-                        } else {
-                            dateMatch = false;
-                        }
+                // Date filter (compare only date part)
+                let dateMatch = true;
+                if (this.search.date) {
+                    // treatment.created_date may be ISO string or similar
+                    const tDate = treatment.created_date ? new Date(treatment.created_date) : null;
+                    const searchDate = new Date(this.search.date);
+                    if (tDate) {
+                        dateMatch = tDate.getFullYear() === searchDate.getFullYear() &&
+                            tDate.getMonth() === searchDate.getMonth() &&
+                            tDate.getDate() === searchDate.getDate();
+                    } else {
+                        dateMatch = false;
                     }
+                }
 
-                    // Time filter (compare hour:minute)
-                    let timeMatch = true;
-                    if (this.search.time) {
-                        const tDate = treatment.created_date ? new Date(treatment.created_date) : null;
-                        if (tDate) {
-                            const tHours = String(tDate.getHours()).padStart(2, '0');
-                            const tMinutes = String(tDate.getMinutes()).padStart(2, '0');
-                            const searchParts = this.search.time.split(':');
-                            timeMatch = tHours === searchParts[0] && tMinutes === searchParts[1];
-                        } else {
-                            timeMatch = false;
-                        }
+                // Time filter (compare hour:minute)
+                let timeMatch = true;
+                if (this.search.time) {
+                    const tDate = treatment.created_date ? new Date(treatment.created_date) : null;
+                    if (tDate) {
+                        const tHours = String(tDate.getHours()).padStart(2, '0');
+                        const tMinutes = String(tDate.getMinutes()).padStart(2, '0');
+                        const searchParts = this.search.time.split(':');
+                        timeMatch = tHours === searchParts[0] && tMinutes === searchParts[1];
+                    } else {
+                        timeMatch = false;
                     }
+                }
 
-                    return patientMatch && dateMatch && timeMatch;
-                });
-            }
+                return patientMatch && dateMatch && timeMatch;
+            });
+        }
     },
     created(){
         this.userStore = useUserStore();
@@ -271,6 +270,7 @@ export default {
             this.search.date = '';
             this.search.time = '';
         },
+        
         async fetchTreatments() {
             try {
                 if (!this.userStore.user || !this.userStore.user.id) {

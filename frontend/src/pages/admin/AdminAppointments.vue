@@ -120,7 +120,6 @@
                                 <label for="status" class="form-label fw-semibold">Status</label>
                                 <select v-model="formData.status" id="status" class="form-select">
                                     <option value="Pending">Pending</option>
-                                    <option value="Confirmed">Confirmed</option>
                                     <option value="Completed">Completed</option>
                                     <option value="Cancelled">Cancelled</option>
                                 </select>

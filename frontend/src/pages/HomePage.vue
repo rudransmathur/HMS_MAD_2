@@ -15,9 +15,9 @@
                         <h1 class="display-6 fw-bold">Welcome Admin</h1>
                     </div>
                     <p class="lead mb-4"> Manage Doctor and patients records, Manage appointments and coordinate care quickly</p>
-                    <router-link to="/" class="btn btn-outline-light btn-lg me-2">##</router-link>
-                    <router-link to="/" class="btn btn-outline-light btn-lg">#####</router-link>
-                    <router-link to="/" class="btn btn-outline-light btn-lg ms-2">###</router-link>
+                    <router-link to="/admindoctors" class="btn btn-outline-light btn-lg me-2">Doctor Requests</router-link>
+                    <router-link to="/adminappointments" class="btn btn-outline-light btn-lg">Manage Appointments</router-link>
+                    <router-link to="/adminsearch" class="btn btn-outline-light btn-lg ms-2">Search Users</router-link>
                 </div>
                 <div v-if="isPatient">
                     <div class="mb-5">

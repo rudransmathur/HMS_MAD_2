@@ -88,6 +88,26 @@
 									<label class="form-label">Phone</label>
 									<input class="form-control" v-model="editForm.phone" />
 								</div>
+								<div v-if = "isDoctor(editingfor)" class="col-md-6">
+									<label class="form-label">Department</label>
+									<input class="form-control" v-model="editForm.department_name" />
+								</div>
+								<div v-if = "isDoctor(editingfor)" class="col-md-6">
+									<label class="form-label">Qualification</label>
+									<input class="form-control" v-model="editForm.qualification" />
+								</div>
+								<div v-if = "isDoctor(editingfor)" class="col-md-6">
+									<label class="form-label">Experience (years)</label>
+									<input class="form-control" v-model="editForm.experience_years" type="number" min="0" />
+								</div>
+								<div v-if = "isDoctor(editingfor)" class="col-md-6">
+									<label class="form-label">Specialization</label>
+									<input class="form-control" v-model="editForm.specialization" />
+								</div>
+								<div v-if = "isDoctor(editingfor)" class="col-md-6">
+									<label class="form-label">Consultation Fee</label>
+									<input class="form-control" v-model="editForm.fee" type="number" min="0" step="0.01" />
+								</div>
 								<div class="col-md-6">
 									<label class="form-label">Active</label>
 									<div><input type="checkbox" v-model="editForm.active" /> <span class="ms-2">Active</span></div>
@@ -157,6 +177,8 @@ export default {
 				this.loading = true;
 				this.error = '';
 				const [usersResp, doctorsResp] = await Promise.all([api.get('/users'), api.get('/doctors')]);
+				console.log("User List", usersResp);
+				console.log("Doctor List", doctorsResp);
 				this.users = Array.isArray(usersResp) ? usersResp : (usersResp.data || []);
 				this.doctors = Array.isArray(doctorsResp) ? doctorsResp : (doctorsResp.data || []);
 			} catch (e) {
@@ -166,18 +188,30 @@ export default {
 				this.loading = false;
 			}
 		},
-		reload() {
-			this.loadAll();
+		openEdit(u) {
+			// Merge doctor-specific fields if user is a doctor
+			let merged = { ...u };
+			if (this.isDoctor(u)) {
+				const doc = (this.doctors || []).find(d => (d.user_id || d.id) === (u.user_id || u.id));
+				if (doc) {
+					merged = {
+						...merged,
+						department_name: doc.department_name,
+						qualification: doc.qualification,
+						experience_years: doc.experience_years,
+						specialization: doc.specialization,
+						fee: doc.consultation_fee
+					};
+				}
+			}
+			this.editForm = merged;
+			this.editing = true;
+			this.editingfor = u;
+			this.editError = '';
 		},
 		isDoctor(u) {
 			const id = u.user_id || u.id;
 			return this.doctorIds.has(id);
-		},
-		openEdit(u) {
-			this.editForm = { ...u };
-			this.editing = true;
-			this.editingfor = u
-			this.editError = '';
 		},
 		closeEdit() {
 			this.editing = false;
