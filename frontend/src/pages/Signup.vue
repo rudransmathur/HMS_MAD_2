@@ -151,39 +151,6 @@
                     </div>
 
                     <hr />
-                    <h6 class="mb-2">Availabilities <small class="text-muted">(Add at least one)</small></h6>
-                    <div class="row g-2 align-items-end">
-                        <div class="col-md-4">
-                            <label class="form-label">Day</label>
-                            <select v-model="availForm.day" class="form-select">
-                                <option value="">-- Select Day --</option>
-                                <option v-for="d in days" :key="d" :value="d">{{ d }}</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Start</label>
-                            <input v-model="availForm.start" type="time" class="form-control" />
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">End</label>
-                            <input v-model="availForm.end" type="time" class="form-control" />
-                        </div>
-                        <div class="col-md-2">
-                            <button type="button" class="btn btn-outline-primary w-100" @click="addAvailability">Add</button>
-                        </div>
-                    </div>
-
-                    <div class="mt-3">
-                        <div v-if="doctor.availabilities.length===0" class="text-muted small">No availabilities added yet.</div>
-                        <ul class="list-group mt-2" v-else>
-                            <li class="list-group-item d-flex justify-content-between align-items-center" v-for="(a, idx) in doctor.availabilities" :key="idx">
-                                <div>{{ a.day }} — {{ a.start }} to {{ a.end }}</div>
-                                <button type="button" class="btn btn-sm btn-danger" @click="removeAvailability(idx)">Remove</button>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <hr />
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Password <span class="text-danger">*</span></label>
                         <input v-model="doctor.password" type="password" class="form-control" required />
@@ -218,7 +185,6 @@ export default {
             role: '',
             loading: false,
             error: '',
-            days: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],
             patient: {
                 role: 'Patient',
                 username: '',
@@ -245,10 +211,8 @@ export default {
                 qualification: '',
                 experience_years: 0,
                 specialization: '',
-                consultation_fee: 0,
-                availabilities: []
+                consultation_fee: 0
             },
-            availForm: { day: '', start: '', end: '' },
             userStore: null
         };
     },
@@ -256,26 +220,6 @@ export default {
         this.userStore = useUserStore();
     },
     methods: {
-        addAvailability() {
-            this.error = '';
-            const { day, start, end } = this.availForm;
-            if (!day || !start || !end) {
-                this.error = 'Please select day, start time and end time to add availability.';
-                return;
-            }
-            if (start >= end) {
-                this.error = 'Start time must be before end time.';
-                return;
-            }
-            this.doctor.availabilities.push({ day, start, end });
-            // reset form
-            this.availForm = { day: '', start: '', end: '' };
-        },
-
-        removeAvailability(idx) {
-            this.doctor.availabilities.splice(idx,1);
-        },
-
         async onSubmitPatient() {
             this.error = '';
             if (this.patient.password !== this.patient.confirm_password) {

@@ -4,7 +4,14 @@
         <div class="mb-5">
             <h1 class="display-6 fw-bold text-primary">Welcome, {{ userStore.user?.fullname || 'Patient' }}!</h1>
             <p class="text-muted">Manage your appointments and healthcare needs</p>
-        </div>
+            
+            <!-- Book Appointment Button -->
+            <div class="text-right mb-5">
+                <button class="btn btn-primary btn-lg" @click="showModal = true">
+                    <i class="bi bi-plus-circle"></i> Book Appointment
+                </button>
+            </div>
+        </div> 
 
         <!-- Error -->
         <div v-if="error" class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -169,13 +176,7 @@
             </div>
         </div>
 
-        <!-- Book Appointment Button -->
-        <div class="text-center mb-5">
-            <button class="btn btn-primary btn-lg" @click="showModal = true">
-                <i class="bi bi-plus-circle"></i> Book Appointment
-            </button>
-        </div>
-
+        
         <!-- Add/Edit Appointment Modal -->
         <div v-if="showModal" class="modal d-block" style="background-color: rgba(0,0,0,0.5);">
             <div class="modal-dialog modal-dialog-centered">

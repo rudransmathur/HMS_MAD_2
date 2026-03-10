@@ -100,7 +100,6 @@ def register():
             experience_years = data["experience_years"]
             specialization = data["specialization"]
             consultation_fee = data["consultation_fee"]
-            availabilities = data["availabilities"]
 
             item = Doctor(doctor_id = user.user_id, department_name = department_name,
                           qualification = qualification, experience_years = experience_years,
@@ -108,22 +107,6 @@ def register():
 
             db.session.add(item)
             db.session.commit()
-
-            for i in availabilities:
-                days_of_week = {"Monday":0, "Tuesday":1, "Wednesday":2, "Thursday":3,
-                                "Friday":4, "Saturday":5, "Sunday":6}
-                # Convert time strings (HH:MM) to Python time objects
-                start_time = i['start']
-                end_time = i['end']
-                if isinstance(start_time, str):
-                    start_time = datetime.strptime(start_time, '%H:%M').time()
-                if isinstance(end_time, str):
-                    end_time = datetime.strptime(end_time, '%H:%M').time()
-
-                item_d = DoctorAvailability(doctor_id = user.user_id, day_of_week = days_of_week[i['day']],
-                                            start_time = start_time, end_time = end_time)
-                db.session.add(item_d)
-                db.session.commit()
             
             req = {"data": data, "status": "created", "type": "put", "user_id": user.user_id}
             RequestService.create_request(req)
