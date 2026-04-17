@@ -6,16 +6,16 @@ echo "It will then install all the required Python libraries."
 echo "You can rerun this without any issues."
 echo "----------------------------------------------------------------------"
 
-# Check if .venv folder exists
-if [ -d ".venv" ]; then
-    echo ".venv folder exists. Installing using pip..."
+# Check if linux.venv folder exists
+if [ -d "linux.venv" ]; then
+    echo "linux.venv folder exists. Installing using pip..."
 else
-    echo "Creating .venv and installing using pip..."
-    python3 -m venv .venv
+    echo "Creating linux.venv and installing using pip..."
+    python3 -m venv linux.venv
 fi
 
 # Activate virtual environment
-source .venv/bin/activate
+source linux.venv/bin/activate
 
 # Install required packages
 if [ -f "requirements.txt" ]; then
